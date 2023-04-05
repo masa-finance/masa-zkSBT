@@ -3,14 +3,14 @@ import chaiAsPromised from "chai-as-promised";
 import { solidity } from "ethereum-waffle";
 import { deployments, ethers, getChainId } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { TestSSSBT, TestSSSBT__factory } from "../typechain";
+import { ZKPSBT, ZKPSBT__factory } from "../typechain";
 
 chai.use(chaiAsPromised);
 chai.use(solidity);
 const expect = chai.expect;
 
 // contract instances
-let testSSSBT: TestSSSBT;
+let zkpSBT: ZKPSBT;
 
 let owner: SignerWithAddress;
 let address1: SignerWithAddress;
@@ -30,10 +30,10 @@ const signMintToAddress = async (
   const signature = await authoritySigner._signTypedData(
     // Domain
     {
-      name: "TestSSSBT",
+      name: "ZKPSBT",
       version: "1.0.0",
       chainId: chainId,
-      verifyingContract: testSSSBT.address
+      verifyingContract: zkpSBT.address
     },
     // Types
     {
@@ -54,52 +54,52 @@ const signMintToAddress = async (
   return signature;
 };
 
-describe("Test SSSBT", () => {
+describe("ZKP SBT", () => {
   before(async () => {
     [, owner, address1, address2, authority] = await ethers.getSigners();
   });
 
   beforeEach(async () => {
-    await deployments.fixture("TestSSSBT", {
+    await deployments.fixture("ZKPSBT", {
       fallbackToGlobal: true
     });
 
-    const { address: testSSSBTAddress } = await deployments.get("TestSSSBT");
+    const { address: zkpSBTAddress } = await deployments.get("ZKPSBT");
 
-    testSSSBT = TestSSSBT__factory.connect(testSSSBTAddress, owner);
+    zkpSBT = ZKPSBT__factory.connect(zkpSBTAddress, owner);
 
     // we add authority account
-    await testSSSBT.addAuthority(authority.address);
+    await zkpSBT.addAuthority(authority.address);
 
     signatureToAddress = await signMintToAddress(address1.address, authority);
   });
 
   describe("owner functions", () => {
     it("should set SoulboundIdentity from owner", async () => {
-      await testSSSBT.connect(owner).setSoulboundIdentity(address1.address);
+      await zkpSBT.connect(owner).setSoulboundIdentity(address1.address);
 
-      expect(await testSSSBT.soulboundIdentity()).to.be.equal(address1.address);
+      expect(await zkpSBT.soulboundIdentity()).to.be.equal(address1.address);
     });
 
     it("should fail to set SoulboundIdentity from non owner", async () => {
       await expect(
-        testSSSBT.connect(address1).setSoulboundIdentity(address1.address)
+        zkpSBT.connect(address1).setSoulboundIdentity(address1.address)
       ).to.be.rejected;
     });
   });
 
   describe("sbt information", () => {
     it("should be able to get sbt information", async () => {
-      expect(await testSSSBT.name()).to.equal("Test SSSBT");
+      expect(await zkpSBT.name()).to.equal("ZKP SBT");
 
-      expect(await testSSSBT.symbol()).to.equal("TSSSBT");
+      expect(await zkpSBT.symbol()).to.equal("ZKPSBT");
     });
   });
 
   describe("mint", () => {
     it("should fail to mint from owner address", async () => {
       await expect(
-        testSSSBT
+        zkpSBT
           .connect(owner)
           ["mint(address,address,address,uint256,bytes)"](
             ethers.constants.AddressZero,
@@ -112,7 +112,7 @@ describe("Test SSSBT", () => {
     });
 
     it("should mint twice", async () => {
-      await testSSSBT
+      await zkpSBT
         .connect(address1)
         ["mint(address,address,address,uint256,bytes)"](
           ethers.constants.AddressZero,
@@ -121,7 +121,7 @@ describe("Test SSSBT", () => {
           signatureDate,
           signatureToAddress
         );
-      await testSSSBT
+      await zkpSBT
         .connect(address1)
         ["mint(address,address,address,uint256,bytes)"](
           ethers.constants.AddressZero,
@@ -131,13 +131,13 @@ describe("Test SSSBT", () => {
           signatureToAddress
         );
 
-      expect(await testSSSBT.totalSupply()).to.equal(2);
-      expect(await testSSSBT.tokenByIndex(0)).to.equal(0);
-      expect(await testSSSBT.tokenByIndex(1)).to.equal(1);
+      expect(await zkpSBT.totalSupply()).to.equal(2);
+      expect(await zkpSBT.tokenByIndex(0)).to.equal(0);
+      expect(await zkpSBT.tokenByIndex(1)).to.equal(1);
     });
 
     it("should mint from final user address", async () => {
-      const mintTx = await testSSSBT
+      const mintTx = await zkpSBT
         .connect(address1)
         ["mint(address,address,address,uint256,bytes)"](
           ethers.constants.AddressZero,
@@ -153,12 +153,12 @@ describe("Test SSSBT", () => {
       expect(toAddress).to.equal(address1.address);
     });
 
-    it("should mint to an address, with a Test SSSBT not linked to an identity SC", async () => {
+    it("should mint to an address, with a ZKP SBT not linked to an identity SC", async () => {
       const signatureToAddress2 = await signMintToAddress(
         address2.address,
         authority
       );
-      const mintTx = await testSSSBT
+      const mintTx = await zkpSBT
         .connect(address2)
         ["mint(address,address,address,uint256,bytes)"](
           ethers.constants.AddressZero,
@@ -175,8 +175,8 @@ describe("Test SSSBT", () => {
 
       const tokenId = mintReceipt.events![0].args![1].toNumber();
 
-      // check that this Test SSSBT is not linked to an identity
-      await expect(testSSSBT.getIdentityId(tokenId)).to.be.revertedWith(
+      // check that this ZKP SBT is not linked to an identity
+      await expect(zkpSBT.getIdentityId(tokenId)).to.be.revertedWith(
         "NotLinkedToAnIdentitySBT"
       );
     });
@@ -185,7 +185,7 @@ describe("Test SSSBT", () => {
   describe("burn", () => {
     it("should burn", async () => {
       // we mint
-      let mintTx = await testSSSBT
+      let mintTx = await zkpSBT
         .connect(address1)
         ["mint(address,address,address,uint256,bytes)"](
           ethers.constants.AddressZero,
@@ -198,7 +198,7 @@ describe("Test SSSBT", () => {
       const tokenId1 = mintReceipt.events![0].args![1].toNumber();
 
       // we mint again
-      mintTx = await testSSSBT
+      mintTx = await zkpSBT
         .connect(address1)
         ["mint(address,address,address,uint256,bytes)"](
           ethers.constants.AddressZero,
@@ -210,28 +210,28 @@ describe("Test SSSBT", () => {
       mintReceipt = await mintTx.wait();
       const tokenId2 = mintReceipt.events![0].args![1].toNumber();
 
-      expect(await testSSSBT.balanceOf(address1.address)).to.be.equal(2);
-      expect(await testSSSBT.balanceOf(address1.address)).to.be.equal(2);
-      expect(await testSSSBT["ownerOf(uint256)"](tokenId1)).to.be.equal(
+      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(2);
+      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(2);
+      expect(await zkpSBT["ownerOf(uint256)"](tokenId1)).to.be.equal(
         address1.address
       );
-      expect(await testSSSBT["ownerOf(uint256)"](tokenId2)).to.be.equal(
+      expect(await zkpSBT["ownerOf(uint256)"](tokenId2)).to.be.equal(
         address1.address
       );
 
-      await testSSSBT.connect(address1).burn(tokenId1);
+      await zkpSBT.connect(address1).burn(tokenId1);
 
-      expect(await testSSSBT.balanceOf(address1.address)).to.be.equal(1);
+      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(1);
 
-      await testSSSBT.connect(address1).burn(tokenId2);
+      await zkpSBT.connect(address1).burn(tokenId2);
 
-      expect(await testSSSBT.balanceOf(address1.address)).to.be.equal(0);
+      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(0);
     });
   });
 
   describe("tokenUri", () => {
     it("should get a valid token URI from its tokenId", async () => {
-      const mintTx = await testSSSBT
+      const mintTx = await zkpSBT
         .connect(address1)
         ["mint(address,address,address,uint256,bytes)"](
           ethers.constants.AddressZero,
@@ -243,7 +243,7 @@ describe("Test SSSBT", () => {
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const tokenUri = await testSSSBT.tokenURI(tokenId);
+      const tokenUri = await zkpSBT.tokenURI(tokenId);
 
       // check if it's a valid url
       expect(() => new URL(tokenUri)).to.not.throw();

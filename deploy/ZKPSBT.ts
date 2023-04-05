@@ -36,7 +36,7 @@ const func: DeployFunction = async ({
     ]
   ];
 
-  const testSSSBTDeploymentResult = await deploy("TestSSSBT", {
+  const zkpSBTDeploymentResult = await deploy("ZKPSBT", {
     from: deployer,
     args: constructorArguments,
     log: true
@@ -46,7 +46,7 @@ const func: DeployFunction = async ({
   if (network.name !== "hardhat") {
     try {
       await hre.run("verify:verify", {
-        address: testSSSBTDeploymentResult.address,
+        address: zkpSBTDeploymentResult.address,
         constructorArguments
       });
     } catch (error) {
@@ -64,18 +64,18 @@ const func: DeployFunction = async ({
       ? new ethers.Wallet(getPrivateKey(network.name), ethers.provider)
       : admin;
 
-    const testSSSBT = await ethers.getContractAt(
-      "TestSSSBT",
-      testSSSBTDeploymentResult.address
+    const zkpSBT = await ethers.getContractAt(
+      "ZKPSBT",
+      zkpSBTDeploymentResult.address
     );
 
-    // add authority to TestSSSBT
-    await testSSSBT
+    // add authority to ZKPSBT
+    await zkpSBT
       .connect(signer)
       .addAuthority(env.AUTHORITY_WALLET || admin.address);
   }
 };
 
-func.tags = ["TestSSSBT"];
+func.tags = ["ZKPSBT"];
 func.dependencies = [];
 export default func;

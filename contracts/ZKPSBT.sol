@@ -9,6 +9,15 @@ import "@masa-finance/masa-contracts-identity/contracts/tokens/MasaSBTSelfSovere
 /// @notice Test Soulbound token
 /// @dev Inherits from the SSSBT contract.
 contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
+    // Struct to store the encrypted data with the public key of the owner of the SBT
+    struct SBTData {
+        bytes hashData; // hash of the data without encryption, used to verify the data
+        bytes encryptedData; // encrypted data with the public key of the owner of the SBT
+    }
+
+    // tokenId => SBTData
+    mapping(uint256 => SBTData) public sbtData;
+
     /// @notice Creates a new Test ZKP SBT
     /// @dev Creates a new Test ZKP SBT, inheriting from the Masa SSSBT contract.
     /// @param admin Administrator of the smart contract
@@ -38,73 +47,42 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
 
     /// @notice Mints a new SBT
     /// @dev The caller must have the MINTER role
-    /// @param paymentMethod Address of token that user want to pay
-    /// @param identityId TokenId of the identity to mint the NFT to
-    /// @param authorityAddress Address of the authority that signed the message
-    /// @param signatureDate Date of the signature
-    /// @param signature Signature of the message
-    /// @return The NFT ID of the newly minted SBT
-    function mint(
-        address paymentMethod,
-        uint256 identityId,
-        address authorityAddress,
-        uint256 signatureDate,
-        bytes calldata signature
-    ) public payable virtual nonReentrant returns (uint256) {
-        address to = soulboundIdentity.ownerOf(identityId);
-        if (to != _msgSender()) revert CallerNotOwner(_msgSender());
-
-        uint256 tokenId = _verifyAndMint(
-            paymentMethod,
-            to,
-            _hash(identityId, authorityAddress, signatureDate),
-            authorityAddress,
-            signature
-        );
-
-        emit MintedToIdentity(
-            tokenId,
-            identityId,
-            authorityAddress,
-            signatureDate,
-            paymentMethod,
-            mintPrice
-        );
-
-        return tokenId;
-    }
-
-    /// @notice Mints a new SBT
-    /// @dev The caller must have the MINTER role
-    /// @param paymentMethod Address of token that user want to pay
     /// @param to The address to mint the SBT to
     /// @param authorityAddress Address of the authority that signed the message
     /// @param signatureDate Date of the signature
+    /// @param hashData Hash of the data without encryption, used to verify the data
+    /// @param encryptedData Encrypted data with the public key of the owner of the SBT
     /// @param signature Signature of the message
     /// @return The SBT ID of the newly minted SBT
     function mint(
-        address paymentMethod,
         address to,
         address authorityAddress,
         uint256 signatureDate,
+        bytes calldata hashData,
+        bytes calldata encryptedData,
         bytes calldata signature
     ) external payable virtual returns (uint256) {
         if (to != _msgSender()) revert CallerNotOwner(_msgSender());
 
         uint256 tokenId = _verifyAndMint(
-            paymentMethod,
+            address(0),
             to,
-            _hash(to, authorityAddress, signatureDate),
+            _hash(to, authorityAddress, signatureDate, hashData, encryptedData),
             authorityAddress,
             signature
         );
+
+        sbtData[tokenId] = SBTData({
+            hashData: hashData,
+            encryptedData: encryptedData
+        });
 
         emit MintedToAddress(
             tokenId,
             to,
             authorityAddress,
             signatureDate,
-            paymentMethod,
+            address(0),
             mintPrice
         );
 
@@ -112,29 +90,11 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
     }
 
     function _hash(
-        uint256 identityId,
-        address authorityAddress,
-        uint256 signatureDate
-    ) internal view returns (bytes32) {
-        return
-            _hashTypedDataV4(
-                keccak256(
-                    abi.encode(
-                        keccak256(
-                            "Mint(uint256 identityId,address authorityAddress,uint256 signatureDate)"
-                        ),
-                        identityId,
-                        authorityAddress,
-                        signatureDate
-                    )
-                )
-            );
-    }
-
-    function _hash(
         address to,
         address authorityAddress,
-        uint256 signatureDate
+        uint256 signatureDate,
+        bytes calldata hashData,
+        bytes calldata encryptedData
     ) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
@@ -150,15 +110,6 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
                 )
             );
     }
-
-    event MintedToIdentity(
-        uint256 tokenId,
-        uint256 identityId,
-        address authorityAddress,
-        uint256 signatureDate,
-        address paymentMethod,
-        uint256 mintPrice
-    );
 
     event MintedToAddress(
         uint256 tokenId,

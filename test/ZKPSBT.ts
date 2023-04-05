@@ -4,6 +4,7 @@ import { solidity } from "ethereum-waffle";
 import { deployments, ethers, getChainId } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { ZKPSBT, ZKPSBT__factory } from "../typechain";
+import { Wallet } from "ethers";
 
 chai.use(chaiAsPromised);
 chai.use(solidity);
@@ -13,9 +14,9 @@ const expect = chai.expect;
 let zkpSBT: ZKPSBT;
 
 let owner: SignerWithAddress;
-let address1: SignerWithAddress;
-let address2: SignerWithAddress;
 let authority: SignerWithAddress;
+let address1: Wallet;
+let address2: Wallet;
 
 const signatureDate = Math.floor(Date.now() / 1000);
 
@@ -53,12 +54,31 @@ const signMint = async (to: string, authoritySigner: SignerWithAddress) => {
 
 describe("ZKP SBT", () => {
   before(async () => {
-    [, owner, address1, address2, authority] = await ethers.getSigners();
+    [, owner, authority] = await ethers.getSigners();
   });
+
+  address1 = new ethers.Wallet(
+    ethers.Wallet.createRandom().privateKey,
+    ethers.provider
+  );
+  address2 = new ethers.Wallet(
+    ethers.Wallet.createRandom().privateKey,
+    ethers.provider
+  );
 
   beforeEach(async () => {
     await deployments.fixture("ZKPSBT", {
       fallbackToGlobal: true
+    });
+
+    await owner.sendTransaction({
+      to: address1.address,
+      value: ethers.utils.parseEther("1.0")
+    });
+
+    await owner.sendTransaction({
+      to: address2.address,
+      value: ethers.utils.parseEther("1.0")
     });
 
     const { address: zkpSBTAddress } = await deployments.get("ZKPSBT");

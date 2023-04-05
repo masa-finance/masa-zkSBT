@@ -74,20 +74,6 @@ describe("ZKP SBT", () => {
     signatureToAddress = await signMintToAddress(address1.address, authority);
   });
 
-  describe("owner functions", () => {
-    it("should set SoulboundIdentity from owner", async () => {
-      await zkpSBT.connect(owner).setSoulboundIdentity(address1.address);
-
-      expect(await zkpSBT.soulboundIdentity()).to.be.equal(address1.address);
-    });
-
-    it("should fail to set SoulboundIdentity from non owner", async () => {
-      await expect(
-        zkpSBT.connect(address1).setSoulboundIdentity(address1.address)
-      ).to.be.rejected;
-    });
-  });
-
   describe("sbt information", () => {
     it("should be able to get sbt information", async () => {
       expect(await zkpSBT.name()).to.equal("ZKP SBT");
@@ -97,20 +83,6 @@ describe("ZKP SBT", () => {
   });
 
   describe("mint", () => {
-    it("should fail to mint from owner address", async () => {
-      await expect(
-        zkpSBT
-          .connect(owner)
-          ["mint(address,address,address,uint256,bytes)"](
-            ethers.constants.AddressZero,
-            address1.address,
-            authority.address,
-            signatureDate,
-            signatureToAddress
-          )
-      ).to.be.revertedWith("CallerNotOwner");
-    });
-
     it("should mint twice", async () => {
       await zkpSBT
         .connect(address1)

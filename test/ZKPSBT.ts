@@ -19,7 +19,7 @@ let authority: SignerWithAddress;
 
 const signatureDate = Math.floor(Date.now() / 1000);
 
-let signatureToAddress: string;
+let signature: string;
 
 const signMintToAddress = async (
   to: string,
@@ -71,7 +71,7 @@ describe("ZKP SBT", () => {
     // we add authority account
     await zkpSBT.addAuthority(authority.address);
 
-    signatureToAddress = await signMintToAddress(address1.address, authority);
+    signature = await signMintToAddress(address1.address, authority);
   });
 
   describe("sbt information", () => {
@@ -86,21 +86,23 @@ describe("ZKP SBT", () => {
     it("should mint twice", async () => {
       await zkpSBT
         .connect(address1)
-        ["mint(address,address,address,uint256,bytes)"](
-          ethers.constants.AddressZero,
+        .mint(
           address1.address,
           authority.address,
           signatureDate,
-          signatureToAddress
+          signature,
+          signature,
+          signature
         );
       await zkpSBT
         .connect(address1)
-        ["mint(address,address,address,uint256,bytes)"](
-          ethers.constants.AddressZero,
+        .mint(
           address1.address,
           authority.address,
           signatureDate,
-          signatureToAddress
+          signature,
+          signature,
+          signature
         );
 
       expect(await zkpSBT.totalSupply()).to.equal(2);
@@ -111,12 +113,13 @@ describe("ZKP SBT", () => {
     it("should mint from final user address", async () => {
       const mintTx = await zkpSBT
         .connect(address1)
-        ["mint(address,address,address,uint256,bytes)"](
-          ethers.constants.AddressZero,
+        .mint(
           address1.address,
           authority.address,
           signatureDate,
-          signatureToAddress
+          signature,
+          signature,
+          signature
         );
       const mintReceipt = await mintTx.wait();
 
@@ -126,18 +129,16 @@ describe("ZKP SBT", () => {
     });
 
     it("should mint to an address, with a ZKP SBT not linked to an identity SC", async () => {
-      const signatureToAddress2 = await signMintToAddress(
-        address2.address,
-        authority
-      );
+      const signature2 = await signMintToAddress(address2.address, authority);
       const mintTx = await zkpSBT
         .connect(address2)
-        ["mint(address,address,address,uint256,bytes)"](
-          ethers.constants.AddressZero,
+        .mint(
           address2.address,
           authority.address,
           signatureDate,
-          signatureToAddress2
+          signature2,
+          signature2,
+          signature2
         );
       const mintReceipt = await mintTx.wait();
 
@@ -159,12 +160,13 @@ describe("ZKP SBT", () => {
       // we mint
       let mintTx = await zkpSBT
         .connect(address1)
-        ["mint(address,address,address,uint256,bytes)"](
-          ethers.constants.AddressZero,
+        .mint(
           address1.address,
           authority.address,
           signatureDate,
-          signatureToAddress
+          signature,
+          signature,
+          signature
         );
       let mintReceipt = await mintTx.wait();
       const tokenId1 = mintReceipt.events![0].args![1].toNumber();
@@ -172,12 +174,13 @@ describe("ZKP SBT", () => {
       // we mint again
       mintTx = await zkpSBT
         .connect(address1)
-        ["mint(address,address,address,uint256,bytes)"](
-          ethers.constants.AddressZero,
+        .mint(
           address1.address,
           authority.address,
           signatureDate,
-          signatureToAddress
+          signature,
+          signature,
+          signature
         );
       mintReceipt = await mintTx.wait();
       const tokenId2 = mintReceipt.events![0].args![1].toNumber();
@@ -205,12 +208,13 @@ describe("ZKP SBT", () => {
     it("should get a valid token URI from its tokenId", async () => {
       const mintTx = await zkpSBT
         .connect(address1)
-        ["mint(address,address,address,uint256,bytes)"](
-          ethers.constants.AddressZero,
+        .mint(
           address1.address,
           authority.address,
           signatureDate,
-          signatureToAddress
+          signature,
+          signature,
+          signature
         );
 
       const mintReceipt = await mintTx.wait();

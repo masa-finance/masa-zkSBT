@@ -21,10 +21,7 @@ const signatureDate = Math.floor(Date.now() / 1000);
 
 let signature: string;
 
-const signMintToAddress = async (
-  to: string,
-  authoritySigner: SignerWithAddress
-) => {
+const signMint = async (to: string, authoritySigner: SignerWithAddress) => {
   const chainId = await getChainId();
 
   const signature = await authoritySigner._signTypedData(
@@ -71,7 +68,7 @@ describe("ZKP SBT", () => {
     // we add authority account
     await zkpSBT.addAuthority(authority.address);
 
-    signature = await signMintToAddress(address1.address, authority);
+    signature = await signMint(address1.address, authority);
   });
 
   describe("sbt information", () => {
@@ -129,7 +126,7 @@ describe("ZKP SBT", () => {
     });
 
     it("should mint to an address, with a ZKP SBT not linked to an identity SC", async () => {
-      const signature2 = await signMintToAddress(address2.address, authority);
+      const signature2 = await signMint(address2.address, authority);
       const mintTx = await zkpSBT
         .connect(address2)
         .mint(

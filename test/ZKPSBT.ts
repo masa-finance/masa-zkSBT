@@ -106,6 +106,8 @@ describe("ZKP SBT", () => {
     await zkpSBT.addAuthority(authority.address);
 
     hashData = keccak256(toUtf8Bytes(JSON.stringify(data)));
+
+    // we encrypt data with public key of address2
     const encryptedDataWithPublicKey = await EthCrypto.encryptWithPublicKey(
       address2.publicKey.replace("0x", ""), // publicKey
       JSON.stringify(data) // message
@@ -117,6 +119,7 @@ describe("ZKP SBT", () => {
       mac: "0x" + encryptedDataWithPublicKey.mac
     };
 
+    // middleware signs the mint to let address1 mint
     signatureToAddress1 = await signMint(
       address1.address,
       authority,
@@ -282,6 +285,46 @@ describe("ZKP SBT", () => {
       // we expect that the token uri is already encoded
       expect(tokenUri).to.equal(encodeURI(tokenUri));
       expect(tokenUri).to.contain("testserver/");
+    });
+  });
+
+  describe("decrypt data", () => {
+    it("decrypt the data with address2 private key", async () => {
+      const mintTx = await zkpSBT
+        .connect(address1)
+        .mint(
+          address1.address,
+          authority.address,
+          signatureDate,
+          hashData,
+          encryptedData,
+          signatureToAddress1
+        );
+
+      const mintReceipt = await mintTx.wait();
+      const tokenId = mintReceipt.events![0].args![1].toNumber();
+      const sbtData = await zkpSBT.sbtData(tokenId);
+
+      // we decrypt the data with the private key of address2
+      const decryptedData = await EthCrypto.decryptWithPrivateKey(
+        address2.privateKey.replace("0x", ""), // privateKey
+        {
+          iv: sbtData.encryptedData.iv.replace("0x", ""),
+          ephemPublicKey: sbtData.encryptedData.ephemPublicKey.replace(
+            "0x",
+            ""
+          ),
+          ciphertext: sbtData.encryptedData.cipherText.replace("0x", ""),
+          mac: sbtData.encryptedData.mac.replace("0x", "")
+        } // encrypted-data
+      );
+      const dataInAddress2 = JSON.parse(decryptedData);
+
+      // we check that the hash of the data is the same
+      expect(keccak256(toUtf8Bytes(decryptedData))).to.equal(sbtData.hashData);
+
+      // we check that the data is the same
+      expect(dataInAddress2.creditScore).to.equal(data.creditScore);
     });
   });
 });

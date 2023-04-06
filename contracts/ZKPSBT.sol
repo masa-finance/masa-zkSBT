@@ -9,10 +9,17 @@ import "@masa-finance/masa-contracts-identity/contracts/tokens/MasaSBTSelfSovere
 /// @notice Test Soulbound token
 /// @dev Inherits from the SSSBT contract.
 contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
+    struct EncryptedData {
+        bytes iv; // IV
+        bytes ephemPublicKey; // ephemPublicKey
+        bytes cipherText; // ciphertext
+        bytes mac; // mac
+    }
+
     // Struct to store the encrypted data with the public key of the owner of the SBT
     struct SBTData {
         bytes hashData; // hash of the data without encryption, used to verify the data
-        bytes encryptedData; // encrypted data with the public key of the owner of the SBT
+        EncryptedData encryptedData; // encrypted data with the public key of the owner of the SBT
     }
 
     // tokenId => SBTData
@@ -59,7 +66,7 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
         address authorityAddress,
         uint256 signatureDate,
         bytes calldata hashData,
-        bytes calldata encryptedData,
+        EncryptedData calldata encryptedData,
         bytes calldata signature
     ) external payable virtual returns (uint256) {
         if (to != _msgSender()) revert CallerNotOwner(_msgSender());
@@ -67,7 +74,13 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
         uint256 tokenId = _verifyAndMint(
             address(0),
             to,
-            _hash(to, authorityAddress, signatureDate, hashData, encryptedData),
+            _hash(
+                to,
+                authorityAddress,
+                signatureDate,
+                hashData,
+                encryptedData.cipherText
+            ),
             authorityAddress,
             signature
         );
@@ -94,18 +107,20 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
         address authorityAddress,
         uint256 signatureDate,
         bytes calldata hashData,
-        bytes calldata encryptedData
+        bytes calldata cipherData
     ) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
                 keccak256(
                     abi.encode(
                         keccak256(
-                            "Mint(address to,address authorityAddress,uint256 signatureDate)"
+                            "Mint(address to,address authorityAddress,uint256 signatureDate,bytes hashData,bytes cipherData)"
                         ),
                         to,
                         authorityAddress,
-                        signatureDate
+                        signatureDate,
+                        keccak256(hashData),
+                        keccak256(cipherData)
                     )
                 )
             );

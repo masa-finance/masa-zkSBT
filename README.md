@@ -2,6 +2,8 @@
 
 A template for creating new SBTs inheriting from the Masa SBT smart contracts, using ZKP.
 
+We use [eth-crypto](https://www.npmjs.com/package/eth-crypto) package to encrypt and decrypt the data.
+
 ## Deployment
 
 ### Preparations

@@ -28,9 +28,14 @@ const data = {
 
 let encryptedData;
 let hashData;
-let signature: string;
+let signatureToAddress1: string;
 
-const signMint = async (to: string, authoritySigner: SignerWithAddress, hashData: string, cipherData: string) => {
+const signMint = async (
+  to: string,
+  authoritySigner: SignerWithAddress,
+  hashData: string,
+  cipherData: string
+) => {
   const chainId = await getChainId();
 
   const signature = await authoritySigner._signTypedData(
@@ -112,8 +117,12 @@ describe("ZKP SBT", () => {
       mac: "0x" + encryptedDataWithPublicKey.mac
     };
 
-    signature = await signMint(address1.address, authority, hashData, encryptedData.cipherText);
-    console.log(signature);
+    signatureToAddress1 = await signMint(
+      address1.address,
+      authority,
+      hashData,
+      encryptedData.cipherText
+    );
   });
 
   describe("sbt information", () => {
@@ -134,7 +143,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signature
+          signatureToAddress1
         );
       await zkpSBT
         .connect(address1)
@@ -144,7 +153,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signature
+          signatureToAddress1
         );
 
       expect(await zkpSBT.totalSupply()).to.equal(2);
@@ -161,7 +170,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signature
+          signatureToAddress1
         );
       const mintReceipt = await mintTx.wait();
 
@@ -171,7 +180,12 @@ describe("ZKP SBT", () => {
     });
 
     it("should mint to an address, with a ZKP SBT not linked to an identity SC", async () => {
-      const signature2 = await signMint(address2.address, authority, hashData, encryptedData.cipherText);
+      const signatureToAddress2 = await signMint(
+        address2.address,
+        authority,
+        hashData,
+        encryptedData.cipherText
+      );
       const mintTx = await zkpSBT
         .connect(address2)
         .mint(
@@ -180,7 +194,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signature2
+          signatureToAddress2
         );
       const mintReceipt = await mintTx.wait();
 
@@ -208,7 +222,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signature
+          signatureToAddress1
         );
       let mintReceipt = await mintTx.wait();
       const tokenId1 = mintReceipt.events![0].args![1].toNumber();
@@ -222,7 +236,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signature
+          signatureToAddress1
         );
       mintReceipt = await mintTx.wait();
       const tokenId2 = mintReceipt.events![0].args![1].toNumber();
@@ -256,7 +270,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signature
+          signatureToAddress1
         );
 
       const mintReceipt = await mintTx.wait();

@@ -30,7 +30,7 @@ let encryptedData;
 let hashData;
 let signature: string;
 
-const signMint = async (to: string, authoritySigner: SignerWithAddress) => {
+const signMint = async (to: string, authoritySigner: SignerWithAddress, hashData: string, cipherData: string) => {
   const chainId = await getChainId();
 
   const signature = await authoritySigner._signTypedData(
@@ -46,14 +46,18 @@ const signMint = async (to: string, authoritySigner: SignerWithAddress) => {
       Mint: [
         { name: "to", type: "address" },
         { name: "authorityAddress", type: "address" },
-        { name: "signatureDate", type: "uint256" }
+        { name: "signatureDate", type: "uint256" },
+        { name: "hashData", type: "bytes" },
+        { name: "cipherData", type: "bytes" }
       ]
     },
     // Value
     {
       to: to,
       authorityAddress: authoritySigner.address,
-      signatureDate: signatureDate
+      signatureDate: signatureDate,
+      hashData: hashData,
+      cipherData: cipherData
     }
   );
 
@@ -97,13 +101,19 @@ describe("ZKP SBT", () => {
     await zkpSBT.addAuthority(authority.address);
 
     hashData = keccak256(toUtf8Bytes(JSON.stringify(data)));
-    encryptedData = await EthCrypto.encryptWithPublicKey(
+    const encryptedDataWithPublicKey = await EthCrypto.encryptWithPublicKey(
       address2.publicKey.replace("0x", ""), // publicKey
       JSON.stringify(data) // message
     );
-    console.log(encryptedData);
+    encryptedData = {
+      iv: "0x" + encryptedDataWithPublicKey.iv,
+      ephemPublicKey: "0x" + encryptedDataWithPublicKey.ephemPublicKey,
+      cipherText: "0x" + encryptedDataWithPublicKey.ciphertext,
+      mac: "0x" + encryptedDataWithPublicKey.mac
+    };
 
-    signature = await signMint(address1.address, authority);
+    signature = await signMint(address1.address, authority, hashData, encryptedData.cipherText);
+    console.log(signature);
   });
 
   describe("sbt information", () => {
@@ -123,7 +133,7 @@ describe("ZKP SBT", () => {
           authority.address,
           signatureDate,
           hashData,
-          signature,
+          encryptedData,
           signature
         );
       await zkpSBT
@@ -133,7 +143,7 @@ describe("ZKP SBT", () => {
           authority.address,
           signatureDate,
           hashData,
-          signature,
+          encryptedData,
           signature
         );
 
@@ -150,7 +160,7 @@ describe("ZKP SBT", () => {
           authority.address,
           signatureDate,
           hashData,
-          signature,
+          encryptedData,
           signature
         );
       const mintReceipt = await mintTx.wait();
@@ -161,7 +171,7 @@ describe("ZKP SBT", () => {
     });
 
     it("should mint to an address, with a ZKP SBT not linked to an identity SC", async () => {
-      const signature2 = await signMint(address2.address, authority);
+      const signature2 = await signMint(address2.address, authority, hashData, encryptedData.cipherText);
       const mintTx = await zkpSBT
         .connect(address2)
         .mint(
@@ -169,7 +179,7 @@ describe("ZKP SBT", () => {
           authority.address,
           signatureDate,
           hashData,
-          signature2,
+          encryptedData,
           signature2
         );
       const mintReceipt = await mintTx.wait();
@@ -197,7 +207,7 @@ describe("ZKP SBT", () => {
           authority.address,
           signatureDate,
           hashData,
-          signature,
+          encryptedData,
           signature
         );
       let mintReceipt = await mintTx.wait();
@@ -211,7 +221,7 @@ describe("ZKP SBT", () => {
           authority.address,
           signatureDate,
           hashData,
-          signature,
+          encryptedData,
           signature
         );
       mintReceipt = await mintTx.wait();
@@ -245,7 +255,7 @@ describe("ZKP SBT", () => {
           authority.address,
           signatureDate,
           hashData,
-          signature,
+          encryptedData,
           signature
         );
 

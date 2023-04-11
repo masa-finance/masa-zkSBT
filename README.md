@@ -74,3 +74,15 @@ npm install -g snarkjs
 cd circuits
 circom multiplier2.circom --r1cs --wasm --sym --c
 ```
+
+# Compute the witness
+
+Enter in the directory `multiplier2_js`, and add the input in the file `input.json` file:
+```
+{"a": "3", "b": "11"}
+```
+
+Then execute:
+```
+node generate_witness.js multiplier2.wasm input.json witness.wtns
+```

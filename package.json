@@ -45,6 +45,7 @@
     "chai": "^4.3.7",
     "chai-as-promised": "^7.1.1",
     "chai-ethers": "^0.0.1",
+    "circomlib": "^2.0.5",
     "envfile": "^6.18.0",
     "eth-crypto": "^2.6.0",
     "ethereum-waffle": "^4.0.10",

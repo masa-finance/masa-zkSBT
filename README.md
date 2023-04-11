@@ -40,3 +40,37 @@ yarn deploy --network {network}
 ### Deployment addresses
 
 You can see the deployment address of the smart contracts in the [deployments/goerli](deployments/goerli) and [deployments/mainnet](deployments/mainnet) folders. For every deployed smart contract you will find a `<smart_contract>.json` JSON file with the address in the `"address"` field.
+
+## Zero-Knowledge Proof
+
+Zero-knowledge proof is a method by which one party (the prover) can prove to another party (the verifier) that the prover knows a value x that fulfills some constraints without revealing any information apart from the fact that he/she knows the value x.
+
+### Circom and dependencies setup
+
+#### Install Rust
+
+```
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+```
+
+#### Build Circom from source
+
+```
+git clone https://github.com/iden3/circom.git
+cd circom
+cargo build --release
+cargo install --path circom
+```
+
+#### Install snarkjs
+
+```
+npm install -g snarkjs
+```
+
+## Compile the circuit
+
+```
+cd circuits
+circom multiplier.circom --r1cs --wasm --sym --c
+```

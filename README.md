@@ -72,5 +72,5 @@ npm install -g snarkjs
 
 ```
 cd circuits
-circom Example_Sha256.circom --r1cs --wasm --sym --c
+circom multiplier2.circom --r1cs --wasm --sym --c
 ```

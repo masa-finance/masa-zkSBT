@@ -263,7 +263,7 @@ describe("ZKP SBT", () => {
       const sbtData = await zkpSBT.sbtData(tokenId);
 
       // we decrypt the data with the private key of address1
-      const decryptedData = await EthCrypto.decryptWithPrivateKey(
+      const decryptedCreditScore = await EthCrypto.decryptWithPrivateKey(
         address1.privateKey.replace("0x", ""), // privateKey
         {
           iv: sbtData.encryptedData.iv.replace("0x", ""),
@@ -275,13 +275,16 @@ describe("ZKP SBT", () => {
           mac: sbtData.encryptedData.mac.replace("0x", "")
         } // encrypted-data
       );
-      const dataInAddress1 = JSON.parse(decryptedData);
+
+      // const dataInAddress1 = JSON.parse(decryptedData);
 
       // we check that the hash of the data is the same
-      expect(keccak256(toUtf8Bytes(decryptedData))).to.equal(sbtData.hashData);
+      expect(
+        keccak256(toUtf8Bytes(address1.address + "+" + decryptedCreditScore))
+      ).to.equal(sbtData.hashData);
 
       // we check that the data is the same
-      expect(dataInAddress1.creditScore).to.equal(creditScore);
+      expect(+decryptedCreditScore).to.equal(creditScore);
     });
   });
 });

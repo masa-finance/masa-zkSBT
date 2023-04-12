@@ -18,17 +18,13 @@ let zkpSBT: ZKPSBT;
 let owner: SignerWithAddress;
 let authority: SignerWithAddress;
 let address1: Wallet;
-let address2: Wallet;
 
 const signatureDate = Math.floor(Date.now() / 1000);
-const data = {
-  creditScore: 45,
-  income: 100000
-};
+const creditScore = 45;
 
 let encryptedData;
 let hashData;
-let signatureToAddress1: string;
+let signature: string;
 
 const signMint = async (
   to: string,
@@ -78,10 +74,6 @@ describe("ZKP SBT", () => {
     ethers.Wallet.createRandom().privateKey,
     ethers.provider
   );
-  address2 = new ethers.Wallet(
-    ethers.Wallet.createRandom().privateKey,
-    ethers.provider
-  );
 
   beforeEach(async () => {
     await deployments.fixture("ZKPSBT", {
@@ -93,11 +85,6 @@ describe("ZKP SBT", () => {
       value: ethers.utils.parseEther("1")
     });
 
-    await owner.sendTransaction({
-      to: address2.address,
-      value: ethers.utils.parseEther("1")
-    });
-
     const { address: zkpSBTAddress } = await deployments.get("ZKPSBT");
 
     zkpSBT = ZKPSBT__factory.connect(zkpSBTAddress, owner);
@@ -105,12 +92,13 @@ describe("ZKP SBT", () => {
     // we add authority account
     await zkpSBT.addAuthority(authority.address);
 
-    hashData = keccak256(toUtf8Bytes(JSON.stringify(data)));
+    // hashData = keccak256(toUtf8Bytes(JSON.stringify(data));
+    hashData = keccak256(toUtf8Bytes(address1.address + "+" + creditScore));
 
-    // we encrypt data with public key of address2
+    // we encrypt data with public key of address1
     const encryptedDataWithPublicKey = await EthCrypto.encryptWithPublicKey(
-      address2.publicKey.replace("0x", ""), // publicKey
-      JSON.stringify(data) // message
+      address1.publicKey.replace("0x", ""), // publicKey
+      creditScore.toString() // message JSON.stringify(data)
     );
     encryptedData = {
       iv: "0x" + encryptedDataWithPublicKey.iv,
@@ -120,7 +108,7 @@ describe("ZKP SBT", () => {
     };
 
     // middleware signs the mint to let address1 mint
-    signatureToAddress1 = await signMint(
+    signature = await signMint(
       address1.address,
       authority,
       hashData,
@@ -146,7 +134,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signatureToAddress1
+          signature
         );
       await zkpSBT
         .connect(address1)
@@ -156,7 +144,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signatureToAddress1
+          signature
         );
 
       expect(await zkpSBT.totalSupply()).to.equal(2);
@@ -173,44 +161,13 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signatureToAddress1
+          signature
         );
       const mintReceipt = await mintTx.wait();
 
       const toAddress = mintReceipt.events![1].args![1];
 
       expect(toAddress).to.equal(address1.address);
-    });
-
-    it("should mint to an address, with a ZKP SBT not linked to an identity SC", async () => {
-      const signatureToAddress2 = await signMint(
-        address2.address,
-        authority,
-        hashData,
-        encryptedData.cipherText
-      );
-      const mintTx = await zkpSBT
-        .connect(address2)
-        .mint(
-          address2.address,
-          authority.address,
-          signatureDate,
-          hashData,
-          encryptedData,
-          signatureToAddress2
-        );
-      const mintReceipt = await mintTx.wait();
-
-      const toAddress = mintReceipt.events![1].args![1];
-
-      expect(toAddress).to.equal(address2.address);
-
-      const tokenId = mintReceipt.events![0].args![1].toNumber();
-
-      // check that this ZKP SBT is not linked to an identity
-      await expect(zkpSBT.getIdentityId(tokenId)).to.be.revertedWith(
-        "NotLinkedToAnIdentitySBT"
-      );
     });
   });
 
@@ -225,7 +182,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signatureToAddress1
+          signature
         );
       let mintReceipt = await mintTx.wait();
       const tokenId1 = mintReceipt.events![0].args![1].toNumber();
@@ -239,7 +196,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signatureToAddress1
+          signature
         );
       mintReceipt = await mintTx.wait();
       const tokenId2 = mintReceipt.events![0].args![1].toNumber();
@@ -273,7 +230,7 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signatureToAddress1
+          signature
         );
 
       const mintReceipt = await mintTx.wait();
@@ -289,7 +246,7 @@ describe("ZKP SBT", () => {
   });
 
   describe("decrypt data", () => {
-    it("decrypt the data with address2 private key", async () => {
+    it("decrypt the data with address1 private key", async () => {
       const mintTx = await zkpSBT
         .connect(address1)
         .mint(
@@ -298,16 +255,16 @@ describe("ZKP SBT", () => {
           signatureDate,
           hashData,
           encryptedData,
-          signatureToAddress1
+          signature
         );
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
       const sbtData = await zkpSBT.sbtData(tokenId);
 
-      // we decrypt the data with the private key of address2
+      // we decrypt the data with the private key of address1
       const decryptedData = await EthCrypto.decryptWithPrivateKey(
-        address2.privateKey.replace("0x", ""), // privateKey
+        address1.privateKey.replace("0x", ""), // privateKey
         {
           iv: sbtData.encryptedData.iv.replace("0x", ""),
           ephemPublicKey: sbtData.encryptedData.ephemPublicKey.replace(
@@ -318,13 +275,13 @@ describe("ZKP SBT", () => {
           mac: sbtData.encryptedData.mac.replace("0x", "")
         } // encrypted-data
       );
-      const dataInAddress2 = JSON.parse(decryptedData);
+      const dataInAddress1 = JSON.parse(decryptedData);
 
       // we check that the hash of the data is the same
       expect(keccak256(toUtf8Bytes(decryptedData))).to.equal(sbtData.hashData);
 
       // we check that the data is the same
-      expect(dataInAddress2.creditScore).to.equal(data.creditScore);
+      expect(dataInAddress1.creditScore).to.equal(creditScore);
     });
   });
 });

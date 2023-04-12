@@ -68,14 +68,14 @@ cargo install --path circom
 npm install -g snarkjs
 ```
 
-## Compile the circuit
+### Compile the circuit
 
 ```
 cd circuits
 circom creditScoreConstraint.circom --r1cs --wasm --sym --c
 ```
 
-# Compute the witness
+### Compute the witness
 
 Enter in the directory `creditScoreConstraint_js`, and add the input in the file `input.json` file:
 ```
@@ -85,4 +85,41 @@ Enter in the directory `creditScoreConstraint_js`, and add the input in the file
 Then execute:
 ```
 node generate_witness.js creditScoreConstraint.wasm input.json witness.wtns
+```
+
+### Run circuit trusted setup
+
+Powers of tau, which is independent of the circuit:
+```
+snarkjs powersoftau new bn128 12 pot12_0000.ptau -v
+snarkjs powersoftau contribute pot12_0000.ptau pot12_0001.ptau --name="First contribution" -v
+```
+
+Phase 2, which depends on the circuit:
+```
+snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v
+snarkjs groth16 setup creditScoreConstraint.r1cs pot12_final.ptau creditScoreConstraint_0000.zkey
+snarkjs zkey contribute creditScoreConstraint_0000.zkey creditScoreConstraint_0001.zkey --name="1st Contributor Name" -v
+snarkjs zkey export verificationkey creditScoreConstraint_0001.zkey verification_key.json
+``
+
+### Generate a proof
+
+Generate a zk-proof associated to the circuit and the witness:
+```
+snarkjs groth16 prove creditScoreConstraint_0001.zkey creditScoreConstraint_js/witness.wtns proof.json public.json
+```
+
+### Verifying a Proof
+
+To verify the proof, execute the following command:
+```
+snarkjs groth16 verify verification_key.json public.json proof.json
+```
+
+### Verifying from a Smart Contract
+
+We need to generate the Solidity code using the command:
+```
+snarkjs zkey export solidityverifier creditScoreConstraint_0001.zkey ../contracts/verifier.sol
 ```

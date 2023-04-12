@@ -10,7 +10,7 @@ ifeq ($(shell uname),Linux)
 	NASM=nasm -felf64
 endif
 	
-all: multiplier2
+all: creditScoreConstraint
 	
 %.o: %.cpp $(DEPS_HPP)
 	$(CC) -c $< $(CFLAGS)
@@ -18,5 +18,5 @@ all: multiplier2
 fr_asm.o: fr.asm
 	$(NASM) fr.asm -o fr_asm.o
 	
-multiplier2: $(DEPS_O) multiplier2.o
-	$(CC) -o multiplier2 *.o -lgmp 
+creditScoreConstraint: $(DEPS_O) creditScoreConstraint.o
+	$(CC) -o creditScoreConstraint *.o -lgmp 

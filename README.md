@@ -72,17 +72,17 @@ npm install -g snarkjs
 
 ```
 cd circuits
-circom multiplier2.circom --r1cs --wasm --sym --c
+circom creditScoreConstraint.circom --r1cs --wasm --sym --c
 ```
 
 # Compute the witness
 
-Enter in the directory `multiplier2_js`, and add the input in the file `input.json` file:
+Enter in the directory `creditScoreConstraint_js`, and add the input in the file `input.json` file:
 ```
-{"a": "3", "b": "11"}
+{"creditScore": 45, "threshold": 40}
 ```
 
 Then execute:
 ```
-node generate_witness.js multiplier2.wasm input.json witness.wtns
+node generate_witness.js creditScoreConstraint.wasm input.json witness.wtns
 ```

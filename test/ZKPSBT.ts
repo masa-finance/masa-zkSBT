@@ -285,6 +285,12 @@ describe("ZKP SBT", () => {
 
       // we check that the data is the same
       expect(+decryptedCreditScore).to.equal(creditScore);
+
+      // we generate a ZKP proof
+      // input public hash
+      // input public to
+      // input public threshold
+      // input private creditScore
     });
   });
 });

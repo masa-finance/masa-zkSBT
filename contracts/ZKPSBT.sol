@@ -18,7 +18,7 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
 
     // Struct to store the encrypted data with the public key of the owner of the SBT
     struct SBTData {
-        bytes hashData; // hash of the data without encryption, used to verify the data
+        bytes hashData; // hash of receiverAddress+creditScore without encryption, used to verify the data
         EncryptedData encryptedData; // encrypted data with the public key of the owner of the SBT
     }
 
@@ -57,7 +57,7 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
     /// @param to The address to mint the SBT to
     /// @param authorityAddress Address of the authority that signed the message
     /// @param signatureDate Date of the signature
-    /// @param hashData Hash of the data without encryption, used to verify the data
+    /// @param hashData Hash of receiverAddress+creditScore without encryption, used to verify the data
     /// @param encryptedData Encrypted data with the public key of the owner of the SBT
     /// @param signature Signature of the message
     /// @return The SBT ID of the newly minted SBT

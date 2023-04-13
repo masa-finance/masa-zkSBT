@@ -7,7 +7,7 @@ const wc = require("../circuits/creditScoreConstraint_js/witness_calculator");
 const wasm_path =
   "circuits/creditScoreConstraint_js/creditScoreConstraint.wasm";
 const zkey_path = "circuits/creditScoreConstraint_0001.zkey";
-const witness_path = "circuits/creditScoreConstraint_js/witness.wtns";
+const witness_path = "circuits/witness.wtns";
 
 const generateWitness = async (inputs) => {
   const buffer = fs.readFileSync(wasm_path);

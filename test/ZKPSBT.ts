@@ -305,16 +305,13 @@ describe("ZKP SBT", () => {
       // we check that the data is the same
       expect(+decryptedCreditScore).to.equal(creditScore);
 
-      // we generate a ZKP proof
-      // input public hash
-      // input public to
-      // input public threshold
-      // input private creditScore
-
       // input of ZKP
       const input = {
-        creditScore: +decryptedCreditScore,
-        threshold: threshold
+        hashData: sbtData.hashData,
+        ownerAddress: address1.address,
+        sbtTokenId: tokenId,
+        threshold: threshold,
+        creditScore: +decryptedCreditScore
       };
 
       // generate ZKP proof

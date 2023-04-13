@@ -3,7 +3,12 @@ import chaiAsPromised from "chai-as-promised";
 import { solidity } from "ethereum-waffle";
 import { deployments, ethers, getChainId } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import { ZKPSBT, ZKPSBT__factory } from "../typechain";
+import {
+  VerifyCreditScore,
+  VerifyCreditScore__factory,
+  ZKPSBT,
+  ZKPSBT__factory
+} from "../typechain";
 import { Wallet } from "ethers";
 import EthCrypto from "eth-crypto";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
@@ -16,6 +21,7 @@ const expect = chai.expect;
 
 // contract instances
 let zkpSBT: ZKPSBT;
+let verifyCreditScore: VerifyCreditScore;
 
 let owner: SignerWithAddress;
 let authority: SignerWithAddress;
@@ -89,8 +95,15 @@ describe("ZKP SBT", () => {
     });
 
     const { address: zkpSBTAddress } = await deployments.get("ZKPSBT");
+    const { address: verifyCreditScoreAddress } = await deployments.get(
+      "VerifyCreditScore"
+    );
 
     zkpSBT = ZKPSBT__factory.connect(zkpSBTAddress, owner);
+    verifyCreditScore = VerifyCreditScore__factory.connect(
+      verifyCreditScoreAddress,
+      owner
+    );
 
     // we add authority account
     await zkpSBT.addAuthority(authority.address);

@@ -34,21 +34,31 @@ contract VerifyCreditScore {
         uint[2] memory c,
         uint[5] memory publicValues
     ) public view {
-        uint256 threshold = publicValues[4];
-        console.log("threshold", threshold);
         require(
             publicValues[0] ==
                 0x0000000000000000000000000000000000000000000000000000000000000001,
             "The claim doesn't satisfy the query condition"
         );
+        bytes memory hashData = abi.encodePacked(publicValues[1]);
+        address ownerAddress = address(uint160(publicValues[2]));
+        uint256 sbtTokenId = publicValues[3];
+        uint256 threshold = publicValues[4];
+
         require(
-            zkpSBT.ownerOf(publicValues[3]) == msg.sender,
-            "The SBT doesn't belong to the sender"
+            zkpSBT.ownerOf(sbtTokenId) == ownerAddress,
+            "The SBT doesn't belong to the address that is trying to claim the loan"
         );
 
         require(
             verifier.verifyProof(a, b, c, publicValues),
             "Proof verification failed"
+        );
+
+        console.log(
+            "Address",
+            ownerAddress,
+            "is elegible for a loan with a credit score >=",
+            threshold
         );
 
         // isElegibleForAirdrop[msg.sender] = true;

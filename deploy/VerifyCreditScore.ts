@@ -20,9 +20,7 @@ const func: DeployFunction = async ({
 
   const verifierDeployed = await deployments.get("Verifier");
 
-  const constructorArguments = [
-    verifierDeployed.address
-  ];
+  const constructorArguments = [verifierDeployed.address];
 
   const verifyCreditScoreDeploymentResult = await deploy("VerifyCreditScore", {
     from: deployer,

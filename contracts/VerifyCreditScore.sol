@@ -6,7 +6,7 @@ interface IVerifier {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[73] memory input
+        uint[2] memory input
     ) external view returns (bool);
 }
 
@@ -26,7 +26,7 @@ contract VerifyCreditScore {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[73] memory publicValues,
+        uint[2] memory publicValues,
         uint256 threshold
     ) public view {
         require(
@@ -35,7 +35,7 @@ contract VerifyCreditScore {
             "The claim doesn't satisfy the query condition"
         );
         require(
-            publicValues[2] == threshold,
+            publicValues[1] == threshold,
             "Invalid threshold value used to generate the proof"
         );
 

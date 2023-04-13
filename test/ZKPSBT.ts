@@ -295,14 +295,15 @@ describe("ZKP SBT", () => {
       // input public threshold
       // input private creditScore
 
+      // input of ZKP
       const input = {
         "creditScore": +decryptedCreditScore,
         "threshold": threshold
       }
 
+      // generate ZKP proof
       const proof = await genProof(input);
 
-      console.log(proof);
     });
   });
 });

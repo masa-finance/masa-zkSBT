@@ -42,7 +42,7 @@ export default {
   networks,
 
   solidity: {
-    compilers:[
+    compilers: [
       {
         version: "0.6.11",
         settings: {
@@ -66,7 +66,7 @@ export default {
             }
           }
         }
-      },
+      }
     ]
   },
   namedAccounts: {

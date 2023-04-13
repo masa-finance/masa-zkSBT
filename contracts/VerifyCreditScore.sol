@@ -1,12 +1,16 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.7;
 
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+
+import "hardhat/console.sol";
+
 interface IVerifier {
     function verifyProof(
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[2] memory input
+        uint[5] memory input
     ) external view returns (bool);
 }
 
@@ -15,9 +19,11 @@ interface IVerifier {
 /// @notice Tests if the user is eligible for a loan based on the credit score
 contract VerifyCreditScore {
     IVerifier verifier;
+    IERC721 zkpSBT;
 
-    constructor(IVerifier _verifier) {
+    constructor(IVerifier _verifier, IERC721 _zkpSBT) {
         verifier = _verifier;
+        zkpSBT = _zkpSBT;
     }
 
     // @notice verifies the validity of the proof, and make further verifications on the public
@@ -26,17 +32,18 @@ contract VerifyCreditScore {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[2] memory publicValues,
-        uint256 threshold
+        uint[5] memory publicValues
     ) public view {
+        uint256 threshold = publicValues[4];
+        console.log("threshold", threshold);
         require(
             publicValues[0] ==
                 0x0000000000000000000000000000000000000000000000000000000000000001,
             "The claim doesn't satisfy the query condition"
         );
         require(
-            publicValues[1] == threshold,
-            "Invalid threshold value used to generate the proof"
+            zkpSBT.ownerOf(publicValues[3]) == msg.sender,
+            "The SBT doesn't belong to the sender"
         );
 
         require(

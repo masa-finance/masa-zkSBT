@@ -31,7 +31,7 @@ uint get_number_of_components() {return 4;}
 
 uint get_size_of_input_hashmap() {return 256;}
 
-uint get_size_of_witness() {return 12;}
+uint get_size_of_witness() {return 15;}
 
 uint get_size_of_constants() {return 5;}
 
@@ -369,7 +369,7 @@ uint cmp_index_ref = 0;
 PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cmp_index_ref]].signalStart + 2];
 // load src
 // end load src
-Fr_copy(aux_dest,&signalValues[mySignalStart + 1]);
+Fr_copy(aux_dest,&signalValues[mySignalStart + 4]);
 }
 // need to run sub component
 assert(!(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1));

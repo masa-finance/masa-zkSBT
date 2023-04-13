@@ -23,5 +23,5 @@ template creditScoreConstraint() {
     out === 1;
 }
 
-component main {public [threshold]} = creditScoreConstraint();
+component main {public [hashData,ownerAddress,sbtTokenId,threshold]} = creditScoreConstraint();
  

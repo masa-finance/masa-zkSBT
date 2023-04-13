@@ -320,7 +320,6 @@ describe("ZKP SBT", () => {
       // generate ZKP proof
       const proof = await genProof(input);
 
-      console.log(proof);
       // check ZKP proof
       await verifyCreditScore.loanEligible(
         proof.a,

@@ -8,7 +8,7 @@ import { Wallet } from "ethers";
 import EthCrypto from "eth-crypto";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
-const { genProof } = require ("../src/solidity-proof-builder");
+const { genProof } = require("../src/solidity-proof-builder");
 
 chai.use(chaiAsPromised);
 chai.use(solidity);
@@ -297,13 +297,12 @@ describe("ZKP SBT", () => {
 
       // input of ZKP
       const input = {
-        "creditScore": +decryptedCreditScore,
-        "threshold": threshold
-      }
+        creditScore: +decryptedCreditScore,
+        threshold: threshold
+      };
 
       // generate ZKP proof
       const proof = await genProof(input);
-
     });
   });
 });

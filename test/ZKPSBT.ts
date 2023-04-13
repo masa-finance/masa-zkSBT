@@ -8,6 +8,8 @@ import { Wallet } from "ethers";
 import EthCrypto from "eth-crypto";
 import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
 
+const { genProof } = require ("../src/solidity-proof-builder");
+
 chai.use(chaiAsPromised);
 chai.use(solidity);
 const expect = chai.expect;
@@ -21,6 +23,7 @@ let address1: Wallet;
 
 const signatureDate = Math.floor(Date.now() / 1000);
 const creditScore = 45;
+const threshold = 40;
 
 let encryptedData;
 let hashData;
@@ -291,6 +294,15 @@ describe("ZKP SBT", () => {
       // input public to
       // input public threshold
       // input private creditScore
+
+      const input = {
+        "creditScore": +decryptedCreditScore,
+        "threshold": threshold
+      }
+
+      const proof = await genProof(input);
+
+      console.log(proof);
     });
   });
 });

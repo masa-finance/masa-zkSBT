@@ -317,9 +317,6 @@ describe("ZKP SBT", () => {
       // generate ZKP proof
       const proof = await genProof(input);
 
-      console.log(input);
-      console.log(proof.PubSignals);
-
       // check ZKP proof
       await verifyCreditScore.loanEligible(
         proof.a,
@@ -327,6 +324,10 @@ describe("ZKP SBT", () => {
         proof.c,
         proof.PubSignals
       );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(threshold);
     });
   });
 });

@@ -21,6 +21,8 @@ contract VerifyCreditScore {
     IVerifier verifier;
     IERC721 zkpSBT;
 
+    mapping(address => uint256) public isElegibleForLoan;
+
     constructor(IVerifier _verifier, IERC721 _zkpSBT) {
         verifier = _verifier;
         zkpSBT = _zkpSBT;
@@ -33,22 +35,20 @@ contract VerifyCreditScore {
         uint[2][2] memory b,
         uint[2] memory c,
         uint[5] memory publicValues
-    ) public view {
-        require(
-            publicValues[0] ==
-                0x0000000000000000000000000000000000000000000000000000000000000001,
-            "The claim doesn't satisfy the query condition"
-        );
-        bytes memory hashData = abi.encodePacked(publicValues[1]);
+    ) public {
         address ownerAddress = address(uint160(publicValues[2]));
         uint256 sbtTokenId = publicValues[3];
         uint256 threshold = publicValues[4];
 
         require(
+            publicValues[0] ==
+                0x0000000000000000000000000000000000000000000000000000000000000001,
+            "The claim doesn't satisfy the query condition"
+        );
+        require(
             zkpSBT.ownerOf(sbtTokenId) == ownerAddress,
             "The SBT doesn't belong to the address that is trying to claim the loan"
         );
-
         require(
             verifier.verifyProof(a, b, c, publicValues),
             "Proof verification failed"
@@ -61,6 +61,6 @@ contract VerifyCreditScore {
             threshold
         );
 
-        // isElegibleForAirdrop[msg.sender] = true;
+        isElegibleForLoan[ownerAddress] = threshold;
     }
 }

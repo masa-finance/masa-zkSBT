@@ -123,3 +123,9 @@ We need to generate the Solidity code using the command:
 ```
 snarkjs zkey export solidityverifier creditScoreConstraint_0001.zkey ../contracts/verifier.sol
 ```
+
+The `Verifier` has a `view` function called `verifyProof` that returns `TRUE` if and only if the proof and the inputs are valid. To facilitate the call, you can use `snarkJS` to generate the parameters of the call by typing:
+
+```
+snarkjs generatecall
+```

@@ -23,9 +23,9 @@ NULL,
 NULL };
 uint get_main_input_signal_start() {return 2;}
 
-uint get_main_input_signal_no() {return 2;}
+uint get_main_input_signal_no() {return 5;}
 
-uint get_total_signal_no() {return 20;}
+uint get_total_signal_no() {return 23;}
 
 uint get_number_of_components() {return 4;}
 
@@ -319,7 +319,7 @@ void creditScoreConstraint_3_create(uint soffset,uint coffset,Circom_CalcWit* ct
 ctx->componentMemory[coffset].templateId = 3;
 ctx->componentMemory[coffset].templateName = "creditScoreConstraint";
 ctx->componentMemory[coffset].signalStart = soffset;
-ctx->componentMemory[coffset].inputCounter = 2;
+ctx->componentMemory[coffset].inputCounter = 5;
 ctx->componentMemory[coffset].componentName = componentName;
 ctx->componentMemory[coffset].idFather = componentFather;
 ctx->componentMemory[coffset].subcomponents = new uint[1]{0};
@@ -343,7 +343,7 @@ uint index_multiple_eq;
 {
 uint aux_create = 0;
 int aux_cmp_num = 0+ctx_index+1;
-uint csoffset = mySignalStart+3;
+uint csoffset = mySignalStart+6;
 for (uint i = 0; i < 1; i++) {
 std::string new_cmp_name = "greaterEqThan";
 GreaterEqThan_2_create(csoffset,aux_cmp_num,ctx,new_cmp_name,myId);
@@ -358,7 +358,7 @@ uint cmp_index_ref = 0;
 PFrElement aux_dest = &ctx->signalValues[ctx->componentMemory[mySubcomponents[cmp_index_ref]].signalStart + 1];
 // load src
 // end load src
-Fr_copy(aux_dest,&signalValues[mySignalStart + 2]);
+Fr_copy(aux_dest,&signalValues[mySignalStart + 5]);
 }
 // no need to run sub component
 assert(ctx->componentMemory[mySubcomponents[cmp_index_ref]].inputCounter -= 1);
@@ -381,8 +381,8 @@ PFrElement aux_dest = &signalValues[mySignalStart + 0];
 // end load src
 Fr_copy(aux_dest,&ctx->signalValues[ctx->componentMemory[mySubcomponents[0]].signalStart + 0]);
 }
-Fr_eq(&expaux[0],&signalValues[mySignalStart + 0],&circuitConstants[2]); // line circom 22
-if (!Fr_isTrue(&expaux[0])) std::cout << "Failed assert in template/function " << myTemplateName << " line 22. " <<  "Followed trace of components: " << ctx->getTrace(myId) << std::endl;
+Fr_eq(&expaux[0],&signalValues[mySignalStart + 0],&circuitConstants[2]); // line circom 23
+if (!Fr_isTrue(&expaux[0])) std::cout << "Failed assert in template/function " << myTemplateName << " line 23. " <<  "Followed trace of components: " << ctx->getTrace(myId) << std::endl;
 assert(Fr_isTrue(&expaux[0]));
 for (uint i = 0; i < 1; i++){
 uint index_subc = ctx->componentMemory[ctx_index].subcomponents[i];

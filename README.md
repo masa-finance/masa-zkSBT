@@ -75,18 +75,6 @@ cd circuits
 circom creditScoreConstraint.circom --r1cs --wasm --sym --c
 ```
 
-### Compute the witness
-
-Enter in the directory `creditScoreConstraint_js`, and add the input in the file `input.json` file:
-```
-{"creditScore": 45, "threshold": 40}
-```
-
-Then execute:
-```
-node generate_witness.js creditScoreConstraint.wasm input.json witness.wtns
-```
-
 ### Run circuit trusted setup
 
 Powers of tau, which is independent of the circuit:
@@ -102,6 +90,24 @@ snarkjs groth16 setup creditScoreConstraint.r1cs pot12_final.ptau creditScoreCon
 snarkjs zkey contribute creditScoreConstraint_0000.zkey creditScoreConstraint_0001.zkey --name="1st Contributor Name" -v
 snarkjs zkey export verificationkey creditScoreConstraint_0001.zkey verification_key.json
 ``
+
+### Compute the witness
+
+Add the input in the file `input.json` file:
+```
+{
+  "hashData": "0x00000000",
+  "ownerAddress": "0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C",
+  "sbtTokenId": 0,
+  "threshold": 40,
+  "creditScore": 45
+}
+```
+
+Then execute:
+```
+node creditScoreConstraint_js/generate_witness.js creditScoreConstraint_js/creditScoreConstraint.wasm input.json witness.wtns
+```
 
 ### Generate a proof
 

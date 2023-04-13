@@ -85,6 +85,9 @@ describe("ZKP SBT", () => {
   );
 
   beforeEach(async () => {
+    await deployments.fixture("VerifyCreditScore", {
+      fallbackToGlobal: true
+    });
     await deployments.fixture("ZKPSBT", {
       fallbackToGlobal: true
     });
@@ -316,6 +319,16 @@ describe("ZKP SBT", () => {
 
       // generate ZKP proof
       const proof = await genProof(input);
+
+      console.log(proof);
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        threshold
+      );
     });
   });
 });

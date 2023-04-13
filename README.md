@@ -113,7 +113,7 @@ node creditScoreConstraint_js/generate_witness.js creditScoreConstraint_js/credi
 
 Generate a zk-proof associated to the circuit and the witness:
 ```
-snarkjs groth16 prove creditScoreConstraint_0001.zkey creditScoreConstraint_js/witness.wtns proof.json public.json
+snarkjs groth16 prove creditScoreConstraint_0001.zkey witness.wtns proof.json public.json
 ```
 
 ### Verifying a Proof

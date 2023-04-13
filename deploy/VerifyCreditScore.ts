@@ -18,9 +18,13 @@ const func: DeployFunction = async ({
 
   [, admin] = await ethers.getSigners();
 
-  const constructorArguments = [];
+  const verifierDeployed = await deployments.get("Verifier");
 
-  const verifierDeploymentResult = await deploy("Verifier", {
+  const constructorArguments = [
+    verifierDeployed.address
+  ];
+
+  const verifyCreditScoreDeploymentResult = await deploy("VerifyCreditScore", {
     from: deployer,
     args: constructorArguments,
     log: true
@@ -30,7 +34,7 @@ const func: DeployFunction = async ({
   if (network.name !== "hardhat") {
     try {
       await hre.run("verify:verify", {
-        address: verifierDeploymentResult.address,
+        address: verifyCreditScoreDeploymentResult.address,
         constructorArguments
       });
     } catch (error) {
@@ -44,6 +48,6 @@ const func: DeployFunction = async ({
   }
 };
 
-func.tags = ["Verifier"];
-func.dependencies = [];
+func.tags = ["VerifyCreditScore"];
+func.dependencies = ["Verifier"];
 export default func;

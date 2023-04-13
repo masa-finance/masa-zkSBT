@@ -21,10 +21,7 @@ const getInfuraURL = (network: string) => {
 const networks: NetworksUserConfig = {
   hardhat: {
     allowUnlimitedContractSize: true,
-    gasPrice: "auto",
-    forking: {
-      url: getInfuraURL("goerli")
-    }
+    gasPrice: "auto"
   },
   goerli: {
     url: getInfuraURL("goerli"),

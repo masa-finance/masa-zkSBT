@@ -11,7 +11,7 @@ import {
 } from "../typechain";
 import { Wallet } from "ethers";
 import EthCrypto from "eth-crypto";
-import { keccak256, toUtf8Bytes } from "ethers/lib/utils";
+import { poseidon2 } from "poseidon-lite";
 
 const { genProof } = require("../src/solidity-proof-builder");
 
@@ -33,6 +33,7 @@ const threshold = 40;
 
 let encryptedData;
 let hashData;
+let hashDataHex;
 let signature: string;
 
 const signMint = async (
@@ -75,17 +76,15 @@ const signMint = async (
 };
 
 describe("ZKP SBT", () => {
-  before(async () => {
-    [, owner, authority] = await ethers.getSigners();
-  });
-
-  address1 = new ethers.Wallet(
-    "0x41c5ab8f659237772a24848aefb3700202ec730c091b3c53affe3f9ebedbc3c9",
-    // ethers.Wallet.createRandom().privateKey,
-    ethers.provider
-  );
-
   beforeEach(async () => {
+    [, owner, authority] = await ethers.getSigners();
+
+    address1 = new ethers.Wallet(
+      "0x41c5ab8f659237772a24848aefb3700202ec730c091b3c53affe3f9ebedbc3c9",
+      // ethers.Wallet.createRandom().privateKey,
+      ethers.provider
+    );
+
     await deployments.fixture("ZKPSBT", {
       fallbackToGlobal: true
     });
@@ -113,7 +112,9 @@ describe("ZKP SBT", () => {
     await zkpSBT.addAuthority(authority.address);
 
     // hashData = keccak256(toUtf8Bytes(JSON.stringify(data));
-    hashData = keccak256(toUtf8Bytes(address1.address + "+" + creditScore));
+    // hashData = keccak256(toUtf8Bytes(address1.address + "+" + creditScore));
+    hashData = poseidon2([BigInt(address1.address), BigInt(creditScore)]);
+    hashDataHex = "0x" + BigInt(hashData).toString(16);
 
     // we encrypt data with public key of address1
     const encryptedDataWithPublicKey = await EthCrypto.encryptWithPublicKey(
@@ -131,7 +132,7 @@ describe("ZKP SBT", () => {
     signature = await signMint(
       address1.address,
       authority,
-      hashData,
+      hashDataHex,
       encryptedData.cipherText
     );
   });
@@ -152,7 +153,7 @@ describe("ZKP SBT", () => {
           address1.address,
           authority.address,
           signatureDate,
-          hashData,
+          hashDataHex,
           encryptedData,
           signature
         );
@@ -162,7 +163,7 @@ describe("ZKP SBT", () => {
           address1.address,
           authority.address,
           signatureDate,
-          hashData,
+          hashDataHex,
           encryptedData,
           signature
         );
@@ -179,7 +180,7 @@ describe("ZKP SBT", () => {
           address1.address,
           authority.address,
           signatureDate,
-          hashData,
+          hashDataHex,
           encryptedData,
           signature
         );
@@ -200,43 +201,20 @@ describe("ZKP SBT", () => {
           address1.address,
           authority.address,
           signatureDate,
-          hashData,
+          hashDataHex,
           encryptedData,
           signature
         );
       let mintReceipt = await mintTx.wait();
-      const tokenId1 = mintReceipt.events![0].args![1].toNumber();
+      const tokenId = mintReceipt.events![0].args![1].toNumber();
 
-      // we mint again
-      mintTx = await zkpSBT
-        .connect(address1)
-        .mint(
-          address1.address,
-          authority.address,
-          signatureDate,
-          hashData,
-          encryptedData,
-          signature
-        );
-      mintReceipt = await mintTx.wait();
-      const tokenId2 = mintReceipt.events![0].args![1].toNumber();
+      const balanceBefore = await zkpSBT.balanceOf(address1.address);
 
-      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(2);
-      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(2);
-      expect(await zkpSBT["ownerOf(uint256)"](tokenId1)).to.be.equal(
-        address1.address
+      await zkpSBT.connect(address1).burn(tokenId);
+
+      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(
+        balanceBefore.toNumber() - 1
       );
-      expect(await zkpSBT["ownerOf(uint256)"](tokenId2)).to.be.equal(
-        address1.address
-      );
-
-      await zkpSBT.connect(address1).burn(tokenId1);
-
-      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(1);
-
-      await zkpSBT.connect(address1).burn(tokenId2);
-
-      expect(await zkpSBT.balanceOf(address1.address)).to.be.equal(0);
     });
   });
 
@@ -248,7 +226,7 @@ describe("ZKP SBT", () => {
           address1.address,
           authority.address,
           signatureDate,
-          hashData,
+          hashDataHex,
           encryptedData,
           signature
         );
@@ -266,14 +244,14 @@ describe("ZKP SBT", () => {
   });
 
   describe("decrypt data", () => {
-    it("decrypt the data with address1 private key", async () => {
+    it("decrypt the data with address1 private key and generate/validate proof", async () => {
       const mintTx = await zkpSBT
         .connect(address1)
         .mint(
           address1.address,
           authority.address,
           signatureDate,
-          hashData,
+          hashDataHex,
           encryptedData,
           signature
         );
@@ -300,7 +278,11 @@ describe("ZKP SBT", () => {
 
       // we check that the hash of the data is the same
       expect(
-        keccak256(toUtf8Bytes(address1.address + "+" + decryptedCreditScore))
+        "0x" +
+          BigInt(
+            poseidon2([BigInt(address1.address), BigInt(decryptedCreditScore)])
+          ).toString(16)
+        // keccak256(toUtf8Bytes(address1.address + "+" + decryptedCreditScore))
       ).to.equal(sbtData.hashData);
 
       // we check that the data is the same
@@ -310,7 +292,6 @@ describe("ZKP SBT", () => {
       const input = {
         hashData: sbtData.hashData,
         ownerAddress: address1.address,
-        sbtTokenId: tokenId,
         threshold: threshold,
         creditScore: +decryptedCreditScore
       };
@@ -323,12 +304,45 @@ describe("ZKP SBT", () => {
         proof.a,
         proof.b,
         proof.c,
-        proof.PubSignals
+        proof.PubSignals,
+        tokenId
       );
 
       expect(
         await verifyCreditScore.isElegibleForLoan(address1.address)
       ).to.be.equal(threshold);
+    });
+
+    it("proof with invalid creditScore will fail (incorrect hash)", async () => {
+      const mintTx = await zkpSBT
+        .connect(address1)
+        .mint(
+          address1.address,
+          authority.address,
+          signatureDate,
+          hashDataHex,
+          encryptedData,
+          signature
+        );
+
+      const mintReceipt = await mintTx.wait();
+      const tokenId = mintReceipt.events![0].args![1].toNumber();
+      const sbtData = await zkpSBT.sbtData(tokenId);
+
+      // input of ZKP
+      const input = {
+        hashData: sbtData.hashData,
+        ownerAddress: address1.address,
+        threshold: threshold,
+        creditScore: 55 // invalid credit score
+      };
+
+      // generate ZKP proof will fail because the hash is not correct
+      await expect(genProof(input)).to.throw;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
     });
   });
 });

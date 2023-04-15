@@ -89,16 +89,15 @@ snarkjs powersoftau prepare phase2 pot12_0001.ptau pot12_final.ptau -v
 snarkjs groth16 setup creditScoreConstraint.r1cs pot12_final.ptau creditScoreConstraint_0000.zkey
 snarkjs zkey contribute creditScoreConstraint_0000.zkey creditScoreConstraint_0001.zkey --name="1st Contributor Name" -v
 snarkjs zkey export verificationkey creditScoreConstraint_0001.zkey verification_key.json
-``
+```
 
 ### Compute the witness
 
 Add the input in the file `input.json` file:
 ```
 {
-  "hashData": "0x00000000",
-  "ownerAddress": "0xD87Ba7A50B2E7E660f678A895E4B72E7CB4CCd9C",
-  "sbtTokenId": 0,
+  "hashData": "0x2ea94e39eedb45eb122224c1dc25809816ea2c29343466c861aa09d1b3936672",
+  "ownerAddress": "0x14B2Bab4d1068e742BAf05F908D7b5A00773B0dd",
   "threshold": 40,
   "creditScore": 45
 }

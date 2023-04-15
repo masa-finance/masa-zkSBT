@@ -12,6 +12,7 @@ import {
 import { Wallet } from "ethers";
 import EthCrypto from "eth-crypto";
 import { poseidon2 } from "poseidon-lite";
+import publicKeyToAddress from "ethereum-public-key-to-address";
 
 const { genProof } = require("../src/solidity-proof-builder");
 
@@ -111,12 +112,16 @@ describe("ZKP SBT", () => {
     // we add authority account
     await zkpSBT.addAuthority(authority.address);
 
-    // hashData = keccak256(toUtf8Bytes(JSON.stringify(data));
-    // hashData = keccak256(toUtf8Bytes(address1.address + "+" + creditScore));
+    // middleware checks that public key belongs to address1
+    expect(publicKeyToAddress(address1.publicKey)).to.be.equal(
+      address1.address
+    );
+
+    // middleware calculates hash of data
     hashData = poseidon2([BigInt(address1.address), BigInt(creditScore)]);
     hashDataHex = "0x" + BigInt(hashData).toString(16);
 
-    // we encrypt data with public key of address1
+    // middleware encrypts data with public key of address1
     const encryptedDataWithPublicKey = await EthCrypto.encryptWithPublicKey(
       address1.publicKey.replace("0x", ""), // publicKey
       creditScore.toString() // message JSON.stringify(data)
@@ -274,15 +279,12 @@ describe("ZKP SBT", () => {
         } // encrypted-data
       );
 
-      // const dataInAddress1 = JSON.parse(decryptedData);
-
       // we check that the hash of the data is the same
       expect(
         "0x" +
           BigInt(
             poseidon2([BigInt(address1.address), BigInt(decryptedCreditScore)])
           ).toString(16)
-        // keccak256(toUtf8Bytes(address1.address + "+" + decryptedCreditScore))
       ).to.equal(sbtData.hashData);
 
       // we check that the data is the same

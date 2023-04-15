@@ -52,6 +52,10 @@ contract ZKPSBT is MasaSBTSelfSovereign, ReentrancyGuard {
         EIP712("ZKPSBT", "1.0.0")
     {}
 
+    function getHashData(uint256 tokenId) external view returns (bytes memory) {
+        return sbtData[tokenId].hashData;
+    }
+
     /// @notice Mints a new SBT
     /// @dev The caller must have the MINTER role
     /// @param to The address to mint the SBT to

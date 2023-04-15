@@ -125,3 +125,6 @@ artifacts
 coverage.json
 
 typechain/
+
+# circom generated files
+*.sym

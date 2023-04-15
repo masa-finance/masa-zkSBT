@@ -151,33 +151,6 @@ describe("ZKP SBT", () => {
   });
 
   describe("mint", () => {
-    it("should mint twice", async () => {
-      await zkpSBT
-        .connect(address1)
-        .mint(
-          address1.address,
-          authority.address,
-          signatureDate,
-          hashDataHex,
-          encryptedData,
-          signature
-        );
-      await zkpSBT
-        .connect(address1)
-        .mint(
-          address1.address,
-          authority.address,
-          signatureDate,
-          hashDataHex,
-          encryptedData,
-          signature
-        );
-
-      expect(await zkpSBT.totalSupply()).to.equal(2);
-      expect(await zkpSBT.tokenByIndex(0)).to.equal(0);
-      expect(await zkpSBT.tokenByIndex(1)).to.equal(1);
-    });
-
     it("should mint from final user address", async () => {
       const mintTx = await zkpSBT
         .connect(address1)

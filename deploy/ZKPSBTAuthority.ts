@@ -25,15 +25,7 @@ const func: DeployFunction = async ({
     env.ADMIN || admin.address,
     env.SBT_NAME,
     env.SBT_SYMBOL,
-    baseUri,
-    ethers.constants.AddressZero,
-    [
-      env.SWAP_ROUTER,
-      env.WETH_TOKEN,
-      env.USDC_TOKEN,
-      env.MASA_TOKEN,
-      env.RESERVE_WALLET || admin.address
-    ]
+    baseUri
   ];
 
   const zkpSBTAuthorityDeploymentResult = await deploy("ZKPSBTAuthority", {
@@ -57,22 +49,6 @@ const func: DeployFunction = async ({
         throw error;
       }
     }
-  }
-
-  if (network.name === "hardhat" || network.name === "goerli") {
-    const signer = env.ADMIN
-      ? new ethers.Wallet(getPrivateKey(network.name), ethers.provider)
-      : admin;
-
-    const zkpSBTAuthority = await ethers.getContractAt(
-      "ZKPSBTAuthority",
-      zkpSBTAuthorityDeploymentResult.address
-    );
-
-    // add authority to ZKPSBTAuthority
-    await zkpSBTAuthority
-      .connect(signer)
-      .addAuthority(env.AUTHORITY_WALLET || admin.address);
   }
 };
 

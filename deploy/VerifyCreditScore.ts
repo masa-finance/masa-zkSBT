@@ -19,11 +19,11 @@ const func: DeployFunction = async ({
   [, admin] = await ethers.getSigners();
 
   const verifierDeployed = await deployments.get("Verifier");
-  const zkpSBTDeployed = await deployments.get("ZKPSBT");
+  const zkpSBTSelfSovereignDeployed = await deployments.get("ZKPSBTSelfSovereign");
 
   const constructorArguments = [
     verifierDeployed.address,
-    zkpSBTDeployed.address
+    zkpSBTSelfSovereignDeployed.address
   ];
 
   const verifyCreditScoreDeploymentResult = await deploy("VerifyCreditScore", {
@@ -51,5 +51,5 @@ const func: DeployFunction = async ({
 };
 
 func.tags = ["VerifyCreditScore"];
-func.dependencies = ["Verifier", "ZKPSBT"];
+func.dependencies = ["Verifier", "ZKPSBTSelfSovereign"];
 export default func;

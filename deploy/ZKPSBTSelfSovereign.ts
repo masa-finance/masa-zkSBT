@@ -36,11 +36,14 @@ const func: DeployFunction = async ({
     ]
   ];
 
-  const zkpSBTSelfSovereignDeploymentResult = await deploy("ZKPSBTSelfSovereign", {
-    from: deployer,
-    args: constructorArguments,
-    log: true
-  });
+  const zkpSBTSelfSovereignDeploymentResult = await deploy(
+    "ZKPSBTSelfSovereign",
+    {
+      from: deployer,
+      args: constructorArguments,
+      log: true
+    }
+  );
 
   // verify contract with etherscan, if its not a local network
   if (network.name !== "hardhat") {

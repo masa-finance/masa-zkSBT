@@ -23,8 +23,8 @@ const func: DeployFunction = async ({
 
   const constructorArguments = [
     env.ADMIN || admin.address,
-    env.SSSBT_NAME,
-    env.SSSBT_SYMBOL,
+    env.SBT_NAME,
+    env.SBT_SYMBOL,
     baseUri,
     ethers.constants.AddressZero,
     [

@@ -287,6 +287,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
+        zkpSBTSelfSovereign.address,
         tokenId
       );
 

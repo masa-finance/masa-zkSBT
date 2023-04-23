@@ -23,13 +23,11 @@ interface IZKPSBT is IERC721 {
 /// @notice Tests if the user is eligible for a loan based on the credit score
 contract VerifyCreditScore {
     IVerifier verifier;
-    IZKPSBT zkpSBT;
 
     mapping(address => uint256) public isElegibleForLoan;
 
-    constructor(IVerifier _verifier, IZKPSBT _zkpSBT) {
+    constructor(IVerifier _verifier) {
         verifier = _verifier;
-        zkpSBT = _zkpSBT;
     }
 
     // @notice verifies the validity of the proof, and make further verifications on the public
@@ -39,6 +37,7 @@ contract VerifyCreditScore {
         uint[2][2] memory b,
         uint[2] memory c,
         uint[4] memory publicValues,
+        IZKPSBT zkpSBT,
         uint256 sbtTokenId
     ) public {
         address ownerAddress = address(uint160(publicValues[2]));

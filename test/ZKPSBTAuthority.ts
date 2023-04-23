@@ -110,9 +110,11 @@ describe("ZKP SBT Authority", () => {
     });
 
     it("should fail to mint from non minter address", async () => {
-      await expect(zkpSBTAuthority
-        .connect(address1)
-        .mint(address1.address, hashDataHex, encryptedData)).to.be.reverted;
+      await expect(
+        zkpSBTAuthority
+          .connect(address1)
+          .mint(address1.address, hashDataHex, encryptedData)
+      ).to.be.reverted;
     });
   });
 
@@ -205,6 +207,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
+        zkpSBTAuthority.address,
         tokenId
       );
 

@@ -35,8 +35,6 @@ contract ZKPSBTAuthority is MasaSBTAuthority, ZKPSBT, ReentrancyGuard {
         bytes calldata hashData,
         EncryptedData calldata encryptedData
     ) external payable virtual returns (uint256) {
-        if (to != _msgSender()) revert CallerNotOwner(_msgSender());
-
         uint256 tokenId = _mintWithCounter(to);
 
         sbtData[tokenId] = SBTData({

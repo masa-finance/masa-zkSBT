@@ -321,7 +321,7 @@ describe("ZKP SBT SelfSovereign", () => {
       };
 
       // generate ZKP proof will fail because the hash is not correct
-      await expect(genProof(input)).to.throw;
+      await expect(genProof(input)).to.be.rejected;
 
       expect(
         await verifyCreditScore.isElegibleForLoan(address1.address)

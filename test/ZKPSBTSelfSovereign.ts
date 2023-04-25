@@ -11,7 +11,7 @@ import {
 } from "../typechain";
 import { Wallet } from "ethers";
 import EthCrypto from "eth-crypto";
-import { poseidon2 } from "poseidon-lite";
+import { poseidon2, poseidon4 } from "poseidon-lite";
 import publicKeyToAddress from "ethereum-public-key-to-address";
 
 const { genProof } = require("../src/solidity-proof-builder");
@@ -30,9 +30,13 @@ let address1: Wallet;
 
 const signatureDate = Math.floor(Date.now() / 1000);
 const creditScore = 45;
+const income = 3100;
+const reportDate = Math.floor(Date.now() / 1000);
 const threshold = 40;
 
-let encryptedData;
+let encryptedCreditScore;
+let encryptedIncome;
+let encryptedReportDate;
 let hashData;
 let hashDataHex;
 let signature: string;
@@ -41,7 +45,9 @@ const signMint = async (
   to: string,
   authoritySigner: SignerWithAddress,
   hashData: string,
-  cipherData: string
+  encryptedCreditScore: string,
+  encryptedIncome: string,
+  encryptedReportDate: string
 ) => {
   const chainId = await getChainId();
 
@@ -60,7 +66,9 @@ const signMint = async (
         { name: "authorityAddress", type: "address" },
         { name: "signatureDate", type: "uint256" },
         { name: "hashData", type: "bytes" },
-        { name: "cipherData", type: "bytes" }
+        { name: "encryptedCreditScore", type: "bytes" },
+        { name: "encryptedIncome", type: "bytes" },
+        { name: "encryptedReportDate", type: "bytes" }
       ]
     },
     // Value
@@ -69,7 +77,9 @@ const signMint = async (
       authorityAddress: authoritySigner.address,
       signatureDate: signatureDate,
       hashData: hashData,
-      cipherData: cipherData
+      encryptedCreditScore: encryptedCreditScore,
+      encryptedIncome: encryptedIncome,
+      encryptedReportDate: encryptedReportDate
     }
   );
 
@@ -123,19 +133,48 @@ describe("ZKP SBT SelfSovereign", () => {
     );
 
     // middleware calculates hash of data
-    hashData = poseidon2([BigInt(address1.address), BigInt(creditScore)]);
+    hashData = poseidon4([
+      BigInt(address1.address),
+      BigInt(creditScore),
+      BigInt(income),
+      BigInt(reportDate)
+    ]);
     hashDataHex = "0x" + BigInt(hashData).toString(16);
 
     // middleware encrypts data with public key of address1
-    const encryptedDataWithPublicKey = await EthCrypto.encryptWithPublicKey(
+    const encryptedCreditScoreWithPublicKey =
+      await EthCrypto.encryptWithPublicKey(
+        address1.publicKey.replace("0x", ""), // publicKey
+        creditScore.toString() // message JSON.stringify(data)
+      );
+    encryptedCreditScore = {
+      iv: "0x" + encryptedCreditScoreWithPublicKey.iv,
+      ephemPublicKey: "0x" + encryptedCreditScoreWithPublicKey.ephemPublicKey,
+      cipherText: "0x" + encryptedCreditScoreWithPublicKey.ciphertext,
+      mac: "0x" + encryptedCreditScoreWithPublicKey.mac
+    };
+
+    const encryptedIncomeWithPublicKey = await EthCrypto.encryptWithPublicKey(
       address1.publicKey.replace("0x", ""), // publicKey
-      creditScore.toString() // message JSON.stringify(data)
+      income.toString() // message JSON.stringify(data)
     );
-    encryptedData = {
-      iv: "0x" + encryptedDataWithPublicKey.iv,
-      ephemPublicKey: "0x" + encryptedDataWithPublicKey.ephemPublicKey,
-      cipherText: "0x" + encryptedDataWithPublicKey.ciphertext,
-      mac: "0x" + encryptedDataWithPublicKey.mac
+    encryptedIncome = {
+      iv: "0x" + encryptedIncomeWithPublicKey.iv,
+      ephemPublicKey: "0x" + encryptedIncomeWithPublicKey.ephemPublicKey,
+      cipherText: "0x" + encryptedIncomeWithPublicKey.ciphertext,
+      mac: "0x" + encryptedIncomeWithPublicKey.mac
+    };
+
+    const encryptedReportDateWithPublicKey =
+      await EthCrypto.encryptWithPublicKey(
+        address1.publicKey.replace("0x", ""), // publicKey
+        reportDate.toString() // message JSON.stringify(data)
+      );
+    encryptedReportDate = {
+      iv: "0x" + encryptedReportDateWithPublicKey.iv,
+      ephemPublicKey: "0x" + encryptedReportDateWithPublicKey.ephemPublicKey,
+      cipherText: "0x" + encryptedReportDateWithPublicKey.ciphertext,
+      mac: "0x" + encryptedReportDateWithPublicKey.mac
     };
 
     // middleware signs the mint to let address1 mint
@@ -143,7 +182,9 @@ describe("ZKP SBT SelfSovereign", () => {
       address1.address,
       authority,
       hashDataHex,
-      encryptedData.cipherText
+      encryptedCreditScore.cipherText,
+      encryptedIncome.cipherText,
+      encryptedReportDate.cipherText
     );
   });
 
@@ -164,7 +205,9 @@ describe("ZKP SBT SelfSovereign", () => {
           authority.address,
           signatureDate,
           hashDataHex,
-          encryptedData,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate,
           signature
         );
       const mintReceipt = await mintTx.wait();
@@ -185,7 +228,9 @@ describe("ZKP SBT SelfSovereign", () => {
           authority.address,
           signatureDate,
           hashDataHex,
-          encryptedData,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate,
           signature
         );
       let mintReceipt = await mintTx.wait();
@@ -212,7 +257,9 @@ describe("ZKP SBT SelfSovereign", () => {
           authority.address,
           signatureDate,
           hashDataHex,
-          encryptedData,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate,
           signature
         );
 
@@ -237,7 +284,9 @@ describe("ZKP SBT SelfSovereign", () => {
           authority.address,
           signatureDate,
           hashDataHex,
-          encryptedData,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate,
           signature
         );
 
@@ -249,13 +298,13 @@ describe("ZKP SBT SelfSovereign", () => {
       const decryptedCreditScore = await EthCrypto.decryptWithPrivateKey(
         address1.privateKey.replace("0x", ""), // privateKey
         {
-          iv: sbtData.encryptedData.iv.replace("0x", ""),
-          ephemPublicKey: sbtData.encryptedData.ephemPublicKey.replace(
+          iv: sbtData.encryptedCreditScore.iv.replace("0x", ""),
+          ephemPublicKey: sbtData.encryptedCreditScore.ephemPublicKey.replace(
             "0x",
             ""
           ),
-          ciphertext: sbtData.encryptedData.cipherText.replace("0x", ""),
-          mac: sbtData.encryptedData.mac.replace("0x", "")
+          ciphertext: sbtData.encryptedCreditScore.cipherText.replace("0x", ""),
+          mac: sbtData.encryptedCreditScore.mac.replace("0x", "")
         } // encrypted-data
       );
 
@@ -304,7 +353,9 @@ describe("ZKP SBT SelfSovereign", () => {
           authority.address,
           signatureDate,
           hashDataHex,
-          encryptedData,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate,
           signature
         );
 

@@ -363,7 +363,9 @@ describe("ZKP SBT SelfSovereign", () => {
         hashData: sbtData.hashData,
         ownerAddress: address1.address,
         threshold: threshold,
-        creditScore: 55 // invalid credit score
+        creditScore: 55, // invalid credit score
+        income: income,
+        reportDate: reportDate
       };
 
       // generate ZKP proof will fail because the hash is not correct

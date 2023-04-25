@@ -10,10 +10,13 @@ import {
   ZKPSBTAuthority__factory
 } from "../typechain";
 import { Wallet } from "ethers";
-import EthCrypto from "eth-crypto";
 import { poseidon2, poseidon4 } from "poseidon-lite";
 import publicKeyToAddress from "ethereum-public-key-to-address";
 
+const {
+  encryptWithPublicKey,
+  decryptWithPrivateKey
+} = require("../src/crypto");
 const { genProof } = require("../src/solidity-proof-builder");
 
 chai.use(chaiAsPromised);
@@ -86,40 +89,20 @@ describe("ZKP SBT Authority", () => {
     hashDataHex = "0x" + BigInt(hashData).toString(16);
 
     // middleware encrypts data with public key of address1
-    const encryptedCreditScoreWithPublicKey =
-      await EthCrypto.encryptWithPublicKey(
-        address1.publicKey.replace("0x", ""), // publicKey
-        creditScore.toString() // message JSON.stringify(data)
-      );
-    encryptedCreditScore = {
-      iv: "0x" + encryptedCreditScoreWithPublicKey.iv,
-      ephemPublicKey: "0x" + encryptedCreditScoreWithPublicKey.ephemPublicKey,
-      cipherText: "0x" + encryptedCreditScoreWithPublicKey.ciphertext,
-      mac: "0x" + encryptedCreditScoreWithPublicKey.mac
-    };
-
-    const encryptedIncomeWithPublicKey = await EthCrypto.encryptWithPublicKey(
-      address1.publicKey.replace("0x", ""), // publicKey
-      income.toString() // message JSON.stringify(data)
+    encryptedCreditScore = await encryptWithPublicKey(
+      address1.publicKey,
+      creditScore.toString()
     );
-    encryptedIncome = {
-      iv: "0x" + encryptedIncomeWithPublicKey.iv,
-      ephemPublicKey: "0x" + encryptedIncomeWithPublicKey.ephemPublicKey,
-      cipherText: "0x" + encryptedIncomeWithPublicKey.ciphertext,
-      mac: "0x" + encryptedIncomeWithPublicKey.mac
-    };
 
-    const encryptedReportDateWithPublicKey =
-      await EthCrypto.encryptWithPublicKey(
-        address1.publicKey.replace("0x", ""), // publicKey
-        reportDate.toString() // message JSON.stringify(data)
-      );
-    encryptedReportDate = {
-      iv: "0x" + encryptedReportDateWithPublicKey.iv,
-      ephemPublicKey: "0x" + encryptedReportDateWithPublicKey.ephemPublicKey,
-      cipherText: "0x" + encryptedReportDateWithPublicKey.ciphertext,
-      mac: "0x" + encryptedReportDateWithPublicKey.mac
-    };
+    encryptedIncome = await encryptWithPublicKey(
+      address1.publicKey,
+      income.toString()
+    );
+
+    encryptedReportDate = await encryptWithPublicKey(
+      address1.publicKey,
+      reportDate.toString()
+    );
   });
 
   describe("sbt information", () => {
@@ -229,17 +212,9 @@ describe("ZKP SBT Authority", () => {
       const sbtData = await zkpSBTAuthority.sbtData(tokenId);
 
       // we decrypt the data with the private key of address1
-      const decryptedCreditScore = await EthCrypto.decryptWithPrivateKey(
-        address1.privateKey.replace("0x", ""), // privateKey
-        {
-          iv: sbtData.encryptedCreditScore.iv.replace("0x", ""),
-          ephemPublicKey: sbtData.encryptedCreditScore.ephemPublicKey.replace(
-            "0x",
-            ""
-          ),
-          ciphertext: sbtData.encryptedCreditScore.cipherText.replace("0x", ""),
-          mac: sbtData.encryptedCreditScore.mac.replace("0x", "")
-        } // encrypted-data
+      const decryptedCreditScore = await decryptWithPrivateKey(
+        address1.privateKey,
+        sbtData.encryptedCreditScore
       );
 
       // we check that the hash of the data is the same

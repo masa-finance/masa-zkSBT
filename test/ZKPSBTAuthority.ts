@@ -216,6 +216,14 @@ describe("ZKP SBT Authority", () => {
         address1.privateKey,
         sbtData.encryptedCreditScore
       );
+      const decryptedIncome = await decryptWithPrivateKey(
+        address1.privateKey,
+        sbtData.encryptedIncome
+      );
+      const decryptedReportDate = await decryptWithPrivateKey(
+        address1.privateKey,
+        sbtData.encryptedReportDate
+      );
 
       // we check that the hash of the data is the same
       expect(
@@ -233,7 +241,9 @@ describe("ZKP SBT Authority", () => {
         hashData: sbtData.hashData,
         ownerAddress: address1.address,
         threshold: threshold,
-        creditScore: +decryptedCreditScore
+        creditScore: +decryptedCreditScore,
+        income: +decryptedIncome,
+        reportDate: +decryptedReportDate
       };
 
       // generate ZKP proof

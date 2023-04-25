@@ -88,7 +88,7 @@ describe("ZKP SBT Authority", () => {
       BigInt(income),
       BigInt(reportDate)
     ]);
-    hashDataHex = "0x" + Buffer.from(hashData).toString("hex");
+    hashDataHex = "0x" + BigInt(poseidon.F.toString(hashData)).toString(16);
 
     // middleware encrypts data with public key of address1
     encryptedCreditScore = await encryptWithPublicKey(
@@ -231,14 +231,16 @@ describe("ZKP SBT Authority", () => {
       const poseidon = await buildPoseidon();
       expect(
         "0x" +
-          Buffer.from(
-            poseidon([
-              BigInt(address1.address),
-              BigInt(decryptedCreditScore),
-              BigInt(income),
-              BigInt(reportDate)
-            ])
-          ).toString("hex")
+          BigInt(
+            poseidon.F.toString(
+              poseidon([
+                BigInt(address1.address),
+                BigInt(decryptedCreditScore),
+                BigInt(income),
+                BigInt(reportDate)
+              ])
+            )
+          ).toString(16)
       ).to.equal(sbtData.hashData);
 
       // we check that the data is the same

@@ -99,7 +99,9 @@ Add the input in the file `input.json` file:
   "hashData": "0x2ea94e39eedb45eb122224c1dc25809816ea2c29343466c861aa09d1b3936672",
   "ownerAddress": "0x14B2Bab4d1068e742BAf05F908D7b5A00773B0dd",
   "threshold": 40,
-  "creditScore": 45
+  "creditScore": 45,
+  "income": 100000,
+  "reportDate": 1675196581804
 }
 ```
 

@@ -10,8 +10,9 @@ import {
   ZKPSBTSelfSovereign__factory
 } from "../typechain";
 import { Wallet } from "ethers";
-import { poseidon2, poseidon4 } from "poseidon-lite";
 import publicKeyToAddress from "ethereum-public-key-to-address";
+
+const buildPoseidon = require("circomlibjs").buildPoseidon;
 
 const {
   encryptWithPublicKey,
@@ -34,7 +35,7 @@ let address1: Wallet;
 const signatureDate = Math.floor(Date.now() / 1000);
 const creditScore = 45;
 const income = 3100;
-const reportDate = Math.floor(Date.now() / 1000);
+const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
 const threshold = 40;
 
 let encryptedCreditScore;
@@ -136,13 +137,14 @@ describe("ZKP SBT SelfSovereign", () => {
     );
 
     // middleware calculates hash of data
-    hashData = poseidon4([
+    const poseidon = await buildPoseidon();
+    hashData = poseidon([
       BigInt(address1.address),
       BigInt(creditScore),
       BigInt(income),
       BigInt(reportDate)
     ]);
-    hashDataHex = "0x" + BigInt(hashData).toString(16);
+    hashDataHex = "0x" + Buffer.from(hashData).toString("hex");
 
     // middleware encrypts data with public key of address1
     encryptedCreditScore = await encryptWithPublicKey(
@@ -292,11 +294,17 @@ describe("ZKP SBT SelfSovereign", () => {
       );
 
       // we check that the hash of the data is the same
+      const poseidon = await buildPoseidon();
       expect(
         "0x" +
-          BigInt(
-            poseidon2([BigInt(address1.address), BigInt(decryptedCreditScore)])
-          ).toString(16)
+          Buffer.from(
+            poseidon([
+              BigInt(address1.address),
+              BigInt(decryptedCreditScore),
+              BigInt(income),
+              BigInt(reportDate)
+            ])
+          ).toString("hex")
       ).to.equal(sbtData.hashData);
 
       // we check that the data is the same
@@ -309,7 +317,7 @@ describe("ZKP SBT SelfSovereign", () => {
         threshold: threshold,
         creditScore: +decryptedCreditScore,
         income: +decryptedIncome,
-        reportDate: +decryptedReportDate,
+        reportDate: +decryptedReportDate
       };
 
       // generate ZKP proof

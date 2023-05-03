@@ -14,7 +14,7 @@
   "license": "MIT",
   "scripts": {
     "compile": "hardhat compile",
-    "tsc": "npx tsc -p . && cp typechain/*.d.ts dist/typechain/",
+    "tsc": "tsc -p . && cp typechain/*.d.ts dist/typechain/",
     "build": "yarn compile && yarn tsc",
     "clean": "hardhat clean",
     "coverage": "hardhat coverage",

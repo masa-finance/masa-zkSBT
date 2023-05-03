@@ -10,6 +10,7 @@ import "@nomiclabs/hardhat-solhint";
 import "@nomiclabs/hardhat-etherscan";
 import "@typechain/ethers-v5";
 import "@typechain/hardhat";
+import "@primitivefi/hardhat-dodoc";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import { NetworksUserConfig } from "hardhat/types";
@@ -37,21 +38,8 @@ const networks: NetworksUserConfig = {
 
 export default {
   networks,
-
   solidity: {
     compilers: [
-      {
-        version: "0.6.11",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 1,
-            details: {
-              yul: false
-            }
-          }
-        }
-      },
       {
         version: "0.8.7",
         settings: {
@@ -78,6 +66,7 @@ export default {
     currency: "USD",
     coinmarketcap: getCoinMarketCapApiKey()
   },
+  dodoc: {},
   typechain: {
     outDir: "typechain"
   }

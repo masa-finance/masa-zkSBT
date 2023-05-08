@@ -642,10 +642,10 @@
   dependencies:
     ethers "~5.7.2"
 
-"@masa-finance/masa-sdk@^1.15.1":
-  version "1.15.1"
-  resolved "https://registry.yarnpkg.com/@masa-finance/masa-sdk/-/masa-sdk-1.15.1.tgz#d09db724ea8cafad84adf4389cce11566749581d"
-  integrity sha512-z7HUauzd4rIhHgqsYVrqhnOKfjCcfZbAwa+maUNWuyLwoeMnuzWWDTJUeyaTlPbSls+a50AjgFvtNh49+qIs4Q==
+"@masa-finance/masa-sdk@^1.15.3":
+  version "1.15.3"
+  resolved "https://registry.yarnpkg.com/@masa-finance/masa-sdk/-/masa-sdk-1.15.3.tgz#775def5c5ff19d1008a8bc00ef40067aad071dd2"
+  integrity sha512-Jw1UpmIwUROfC7+jlaorhN65MQ6QGmfaPxX/RJpMNAQvhia6Afzy6ZeFBZ+MGEuabW81XSE7iPsjjxvcrjs9eQ==
   dependencies:
     "@masa-finance/masa-contracts-identity" "^1.5.3"
     "@masa-finance/masa-token" "^2.0.0"
@@ -6314,12 +6314,7 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typescript@^5.0.2:
-  version "5.0.2"
-  resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.2.tgz#891e1a90c5189d8506af64b9ef929fca99ba1ee5"
-  integrity sha512-wVORMBGO/FAs/++blGNeAVdbNKtIh1rbBL2EyQ1+J9lClJ93KiiKe8PmFIVdXhHcyv44SL9oglmfeSsndo0jRw==
-
-typescript@^5.0.4:
+typescript@^5.0.2, typescript@^5.0.4:
   version "5.0.4"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.0.4.tgz#b217fd20119bd61a94d4011274e0ab369058da3b"
   integrity sha512-cW9T5W9xY37cc+jfEnaUvX91foxtHkza3Nw3wkoF4sSlKn0MONdkdEndig/qPBWXNkmplh3NzayQzCiHM4/hqw==

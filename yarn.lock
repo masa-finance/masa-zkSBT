@@ -635,7 +635,7 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@masa-finance/masa-contracts-identity@^1.5.3", "@masa-finance/masa-contracts-identity@^1.6.1":
+"@masa-finance/masa-contracts-identity@^1.6.1":
   version "1.6.1"
   resolved "https://registry.yarnpkg.com/@masa-finance/masa-contracts-identity/-/masa-contracts-identity-1.6.1.tgz#1f736c79623f4546fb8bb37b303f990183c179f7"
   integrity sha512-V+rJJWez5SyJtPkO7ebPg03cQuxfDrR2krgh34a+/khGBnpT0Lbp48OkuO31yAkHaYXAA+tIecJWmQT7UklJ1A==

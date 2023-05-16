@@ -24,7 +24,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
-        ISoulboundIdentity soulboundIdentity,
+        address soulboundIdentity,
         PaymentParams memory paymentParams
     )
         MasaSBTSelfSovereign(
@@ -57,7 +57,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
     ) external payable virtual returns (uint256) {
         if (to != _msgSender()) revert CallerNotOwner(_msgSender());
 
-        uint256 tokenId = _verifyAndMint(
+        uint256 tokenId = _mintWithCounter(
             address(0),
             to,
             _hash(

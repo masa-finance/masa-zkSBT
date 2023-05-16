@@ -25,7 +25,18 @@ const func: DeployFunction = async ({
     env.ADMIN || admin.address,
     env.SBT_NAME,
     env.SBT_SYMBOL,
-    baseUri
+    baseUri,
+    ethers.constants.AddressZero,
+    [
+      env.SWAP_ROUTER,
+      env.WETH_TOKEN,
+      env.USDC_TOKEN,
+      env.MASA_TOKEN,
+      env.PROJECTFEE_RECEIVER || admin.address,
+      env.PROTOCOLFEE_RECEIVER || ethers.constants.AddressZero,
+      env.PROTOCOLFEE_AMOUNT || 0,
+      env.PROTOCOLFEE_PERCENT || 0
+    ]
   ];
 
   const zkpSBTAuthorityDeploymentResult = await deploy("ZKPSBTAuthority", {

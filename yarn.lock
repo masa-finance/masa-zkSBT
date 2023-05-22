@@ -5131,10 +5131,10 @@ pluralize@^8.0.0:
   resolved "https://registry.yarnpkg.com/pluralize/-/pluralize-8.0.0.tgz#1a6fa16a38d12a1901e0320fa017051c539ce3b1"
   integrity sha512-Nc3IT5yHzflTfbjgqWcCPpo7DaKy4FnpB0l/zCAW0Tc7jxAiuqSxHasntB3D7887LSrA93kDJ9IXovxJYxyLCA==
 
-poseidon-lite@^0.1.0:
-  version "0.1.0"
-  resolved "https://registry.yarnpkg.com/poseidon-lite/-/poseidon-lite-0.1.0.tgz#385f9c229e2e5325911e0cf5a70c623310ff4e34"
-  integrity sha512-aYKHQPpLaSrEOllS6MwGtch6xHViS0MlpwHiKOUI7h7geVsmg3FC13LzY8bpIndBRNNpOJM2j/9VtS6ZmALQNw==
+poseidon-lite@^0.2.0:
+  version "0.2.0"
+  resolved "https://registry.yarnpkg.com/poseidon-lite/-/poseidon-lite-0.2.0.tgz#dbc242ebd9c10c32d507a533fa497231d168fd72"
+  integrity sha512-vivDZnGmz8W4G/GzVA72PXkfYStjilu83rjjUfpL4PueKcC8nfX6hCPh2XhoC5FBgC6y0TA3YuUeUo5YCcNoig==
 
 prelude-ls@~1.1.2:
   version "1.1.2"

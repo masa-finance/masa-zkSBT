@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.7;
+pragma solidity ^0.8.8;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@masa-finance/masa-contracts-identity/contracts/tokens/MasaSBTSelfSovereign.sol";
@@ -24,7 +24,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
-        ISoulboundIdentity soulboundIdentity,
+        address soulboundIdentity,
         PaymentParams memory paymentParams
     )
         MasaSBTSelfSovereign(
@@ -71,7 +71,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
             encryptedReportDate.cipherText
         );
 
-        uint256 tokenId = _verifyAndMint(
+        uint256 tokenId = _mintWithCounter(
             address(0),
             to,
             hash,

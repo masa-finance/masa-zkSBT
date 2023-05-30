@@ -10,6 +10,7 @@ import "@nomiclabs/hardhat-solhint";
 import "@nomiclabs/hardhat-etherscan";
 import "@typechain/ethers-v5";
 import "@typechain/hardhat";
+import "@primitivefi/hardhat-dodoc";
 import "hardhat-gas-reporter";
 import "solidity-coverage";
 import { NetworksUserConfig } from "hardhat/types";
@@ -37,23 +38,10 @@ const networks: NetworksUserConfig = {
 
 export default {
   networks,
-
   solidity: {
     compilers: [
       {
-        version: "0.6.11",
-        settings: {
-          optimizer: {
-            enabled: true,
-            runs: 1,
-            details: {
-              yul: false
-            }
-          }
-        }
-      },
-      {
-        version: "0.8.7",
+        version: "0.8.8",
         settings: {
           optimizer: {
             enabled: true,
@@ -81,6 +69,7 @@ export default {
     gasPriceApi:
       "https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice"
   },
+  dodoc: {},
   typechain: {
     outDir: "typechain"
   }

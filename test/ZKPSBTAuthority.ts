@@ -10,10 +10,14 @@ import {
   ZKPSBTAuthority__factory
 } from "../typechain";
 import { Wallet } from "ethers";
-import EthCrypto from "eth-crypto";
-import { poseidon2 } from "poseidon-lite";
 import publicKeyToAddress from "ethereum-public-key-to-address";
 
+const buildPoseidon = require("circomlibjs").buildPoseidon;
+
+const {
+  encryptWithPublicKey,
+  decryptWithPrivateKey
+} = require("../src/crypto");
 const { genProof } = require("../src/solidity-proof-builder");
 
 chai.use(chaiAsPromised);
@@ -28,9 +32,13 @@ let owner: SignerWithAddress;
 let address1: Wallet;
 
 const creditScore = 45;
+const income = 3100;
+const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
 const threshold = 40;
 
-let encryptedData;
+let encryptedCreditScore;
+let encryptedIncome;
+let encryptedReportDate;
 let hashData;
 let hashDataHex;
 
@@ -73,20 +81,30 @@ describe("ZKP SBT Authority", () => {
     );
 
     // middleware calculates hash of data
-    hashData = poseidon2([BigInt(address1.address), BigInt(creditScore)]);
-    hashDataHex = "0x" + BigInt(hashData).toString(16);
+    const poseidon = await buildPoseidon();
+    hashData = poseidon([
+      BigInt(address1.address),
+      BigInt(creditScore),
+      BigInt(income),
+      BigInt(reportDate)
+    ]);
+    hashDataHex = "0x" + BigInt(poseidon.F.toString(hashData)).toString(16);
 
     // middleware encrypts data with public key of address1
-    const encryptedDataWithPublicKey = await EthCrypto.encryptWithPublicKey(
-      address1.publicKey.replace("0x", ""), // publicKey
-      creditScore.toString() // message JSON.stringify(data)
+    encryptedCreditScore = await encryptWithPublicKey(
+      address1.publicKey,
+      creditScore.toString()
     );
-    encryptedData = {
-      iv: "0x" + encryptedDataWithPublicKey.iv,
-      ephemPublicKey: "0x" + encryptedDataWithPublicKey.ephemPublicKey,
-      cipherText: "0x" + encryptedDataWithPublicKey.ciphertext,
-      mac: "0x" + encryptedDataWithPublicKey.mac
-    };
+
+    encryptedIncome = await encryptWithPublicKey(
+      address1.publicKey,
+      income.toString()
+    );
+
+    encryptedReportDate = await encryptWithPublicKey(
+      address1.publicKey,
+      reportDate.toString()
+    );
   });
 
   describe("sbt information", () => {
@@ -101,7 +119,13 @@ describe("ZKP SBT Authority", () => {
     it("should mint from owner", async () => {
       const mintTx = await zkpSBTAuthority
         .connect(owner)
-        .mint(address1.address, hashDataHex, encryptedData);
+        .mint(
+          address1.address,
+          hashDataHex,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate
+        );
       const mintReceipt = await mintTx.wait();
 
       const toAddress = mintReceipt.events![1].args![1];
@@ -113,7 +137,13 @@ describe("ZKP SBT Authority", () => {
       await expect(
         zkpSBTAuthority
           .connect(address1)
-          .mint(address1.address, hashDataHex, encryptedData)
+          .mint(
+            address1.address,
+            hashDataHex,
+            encryptedCreditScore,
+            encryptedIncome,
+            encryptedReportDate
+          )
       ).to.be.reverted;
     });
   });
@@ -123,7 +153,13 @@ describe("ZKP SBT Authority", () => {
       // we mint
       let mintTx = await zkpSBTAuthority
         .connect(owner)
-        .mint(address1.address, hashDataHex, encryptedData);
+        .mint(
+          address1.address,
+          hashDataHex,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate
+        );
       let mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
 
@@ -141,7 +177,13 @@ describe("ZKP SBT Authority", () => {
     it("should get a valid token URI from its tokenId", async () => {
       const mintTx = await zkpSBTAuthority
         .connect(owner)
-        .mint(address1.address, hashDataHex, encryptedData);
+        .mint(
+          address1.address,
+          hashDataHex,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate
+        );
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
@@ -159,31 +201,45 @@ describe("ZKP SBT Authority", () => {
     it("decrypt the data with address1 private key and generate/validate proof", async () => {
       const mintTx = await zkpSBTAuthority
         .connect(owner)
-        .mint(address1.address, hashDataHex, encryptedData);
+        .mint(
+          address1.address,
+          hashDataHex,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate
+        );
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
       const sbtData = await zkpSBTAuthority.sbtData(tokenId);
 
       // we decrypt the data with the private key of address1
-      const decryptedCreditScore = await EthCrypto.decryptWithPrivateKey(
-        address1.privateKey.replace("0x", ""), // privateKey
-        {
-          iv: sbtData.encryptedData.iv.replace("0x", ""),
-          ephemPublicKey: sbtData.encryptedData.ephemPublicKey.replace(
-            "0x",
-            ""
-          ),
-          ciphertext: sbtData.encryptedData.cipherText.replace("0x", ""),
-          mac: sbtData.encryptedData.mac.replace("0x", "")
-        } // encrypted-data
+      const decryptedCreditScore = await decryptWithPrivateKey(
+        address1.privateKey,
+        sbtData.encryptedCreditScore
+      );
+      const decryptedIncome = await decryptWithPrivateKey(
+        address1.privateKey,
+        sbtData.encryptedIncome
+      );
+      const decryptedReportDate = await decryptWithPrivateKey(
+        address1.privateKey,
+        sbtData.encryptedReportDate
       );
 
       // we check that the hash of the data is the same
+      const poseidon = await buildPoseidon();
       expect(
         "0x" +
           BigInt(
-            poseidon2([BigInt(address1.address), BigInt(decryptedCreditScore)])
+            poseidon.F.toString(
+              poseidon([
+                BigInt(address1.address),
+                BigInt(decryptedCreditScore),
+                BigInt(income),
+                BigInt(reportDate)
+              ])
+            )
           ).toString(16)
       ).to.equal(sbtData.hashData);
 
@@ -195,7 +251,9 @@ describe("ZKP SBT Authority", () => {
         hashData: sbtData.hashData,
         ownerAddress: address1.address,
         threshold: threshold,
-        creditScore: +decryptedCreditScore
+        creditScore: +decryptedCreditScore,
+        income: +decryptedIncome,
+        reportDate: +decryptedReportDate
       };
 
       // generate ZKP proof
@@ -219,7 +277,13 @@ describe("ZKP SBT Authority", () => {
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
       const mintTx = await zkpSBTAuthority
         .connect(owner)
-        .mint(address1.address, hashDataHex, encryptedData);
+        .mint(
+          address1.address,
+          hashDataHex,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate
+        );
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
@@ -230,7 +294,9 @@ describe("ZKP SBT Authority", () => {
         hashData: sbtData.hashData,
         ownerAddress: address1.address,
         threshold: threshold,
-        creditScore: 55 // invalid credit score
+        creditScore: 55, // invalid credit score
+        income: income,
+        reportDate: reportDate
       };
 
       // generate ZKP proof will fail because the hash is not correct

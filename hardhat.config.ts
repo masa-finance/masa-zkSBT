@@ -64,7 +64,10 @@ export default {
   },
   gasReporter: {
     currency: "USD",
-    coinmarketcap: getCoinMarketCapApiKey()
+    coinmarketcap: getCoinMarketCapApiKey(),
+    token: "MATIC",
+    gasPriceApi:
+      "https://api.polygonscan.com/api?module=proxy&action=eth_gasPrice"
   },
   dodoc: {},
   typechain: {

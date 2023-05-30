@@ -41,18 +41,24 @@ contract ZKPSBTAuthority is MasaSBTAuthority, ZKPSBT, ReentrancyGuard {
     /// @dev The caller must have the MINTER role
     /// @param to The address to mint the SBT to
     /// @param hashData Hash of ownerAddress+creditScore without encryption, used to verify the data
-    /// @param encryptedData Encrypted data with the public key of the owner of the SBT
+    /// @param encryptedCreditScore Encrypted credit score
+    /// @param encryptedIncome Encrypted income
+    /// @param encryptedReportDate Encrypted report date
     /// @return The SBT ID of the newly minted SBT
     function mint(
         address to,
         bytes calldata hashData,
-        EncryptedData calldata encryptedData
+        EncryptedData calldata encryptedCreditScore,
+        EncryptedData calldata encryptedIncome,
+        EncryptedData calldata encryptedReportDate
     ) external payable virtual returns (uint256) {
         uint256 tokenId = _mintWithCounter(address(0), to);
 
         sbtData[tokenId] = SBTData({
             hashData: hashData,
-            encryptedData: encryptedData
+            encryptedCreditScore: encryptedCreditScore,
+            encryptedIncome: encryptedIncome,
+            encryptedReportDate: encryptedReportDate
         });
 
         emit MintedToAddress(tokenId, to);

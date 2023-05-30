@@ -15,7 +15,10 @@ abstract contract ZKPSBT {
     // Struct to store the encrypted data with the public key of the owner of the SBT
     struct SBTData {
         bytes hashData; // hash of ownerAddress+creditScore without encryption, used to verify the data
-        EncryptedData encryptedData; // encrypted data with the public key of the owner of the SBT
+        // encrypted data with the public key of the owner of the SBT
+        EncryptedData encryptedCreditScore;
+        EncryptedData encryptedIncome;
+        EncryptedData encryptedReportDate;
     }
 
     // tokenId => SBTData
@@ -27,7 +30,19 @@ abstract contract ZKPSBT {
 
     function getEncryptedData(
         uint256 tokenId
-    ) external view returns (EncryptedData memory) {
-        return sbtData[tokenId].encryptedData;
+    )
+        external
+        view
+        returns (
+            EncryptedData memory,
+            EncryptedData memory,
+            EncryptedData memory
+        )
+    {
+        return (
+            sbtData[tokenId].encryptedCreditScore,
+            sbtData[tokenId].encryptedIncome,
+            sbtData[tokenId].encryptedReportDate
+        );
     }
 }

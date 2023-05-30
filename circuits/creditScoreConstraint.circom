@@ -9,15 +9,19 @@ template creditScoreConstraint() {
     signal input ownerAddress;
     signal input threshold;
     // private
-    signal input creditScore; 
+    signal input creditScore;
+    signal input income;
+    signal input reportDate;
 
     // true/false
     signal output out;
 
     // check hash of creditScore to be equal to hashData
-    component hash = Poseidon(2);
+    component hash = Poseidon(4);
     hash.inputs[0] <== ownerAddress;
     hash.inputs[1] <== creditScore;
+    hash.inputs[2] <== income;
+    hash.inputs[3] <== reportDate;
     hashData === hash.out;
 
     // considering max creditScore 127

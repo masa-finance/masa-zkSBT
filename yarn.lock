@@ -635,19 +635,19 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@masa-finance/masa-contracts-identity@^1.6.1", "@masa-finance/masa-contracts-identity@^1.7.0":
-  version "1.7.0"
-  resolved "https://registry.yarnpkg.com/@masa-finance/masa-contracts-identity/-/masa-contracts-identity-1.7.0.tgz#4248d1eae9d90a6e558be716b1a864358d44a48d"
-  integrity sha512-XewBQzADlZJ2tkxrXS9DSbPvwd9An0kBbLg12DpGtHWr4mxNQz8Gg+o0SebajYGAcMmJxvd+K6fsWUEr26l/ow==
+"@masa-finance/masa-contracts-identity@^1.6.1", "@masa-finance/masa-contracts-identity@^1.8.0":
+  version "1.8.0"
+  resolved "https://registry.yarnpkg.com/@masa-finance/masa-contracts-identity/-/masa-contracts-identity-1.8.0.tgz#d32b9416a377a736b567a6bcbbedcf973314b269"
+  integrity sha512-cpUVyWmlOP3683MiSTYKlTOAgmYpGhOIsnCNpU/nq2nP4hUOzCX4O3lpFTUMHIZEY6yX36Y1Rg/bonc3ELLk5A==
   dependencies:
     ethers "~5.7.2"
 
-"@masa-finance/masa-sdk@^2.2.1":
-  version "2.2.1"
-  resolved "https://registry.yarnpkg.com/@masa-finance/masa-sdk/-/masa-sdk-2.2.1.tgz#5cad3e9a3744d1363245ddefa54eb45c21db65f7"
-  integrity sha512-/ob/e4jWvR0lsKkCwRbRXfafR1ukLw7Gbx39zZaJ6bd3m9KSgNck8Ct3ry00U8QkhZ3TCwtSN0l/ipxxRtF9ow==
+"@masa-finance/masa-sdk@^3.1.1":
+  version "3.1.1"
+  resolved "https://registry.yarnpkg.com/@masa-finance/masa-sdk/-/masa-sdk-3.1.1.tgz#6682ddd10d7feb3417a17e628541ec36bfaef372"
+  integrity sha512-YAqqYn3WOAnRkVOqx+rWfuz6SUI9FmpiXiipW+4lVUtDKA8feYqClQ6vlH3uGhcam//TQO3x4SC0gpt9ESnheA==
   dependencies:
-    "@masa-finance/masa-contracts-identity" "^1.7.0"
+    "@masa-finance/masa-contracts-identity" "^1.8.0"
     "@masa-finance/masa-token" "^2.0.0"
     arweave "1.11.8"
     axios "^1.3.2"
@@ -3489,10 +3489,10 @@ hardhat-deploy-ethers@^0.3.0-beta.13:
   resolved "https://registry.yarnpkg.com/hardhat-deploy-ethers/-/hardhat-deploy-ethers-0.3.0-beta.13.tgz#b96086ff768ddf69928984d5eb0a8d78cfca9366"
   integrity sha512-PdWVcKB9coqWV1L7JTpfXRCI91Cgwsm7KLmBcwZ8f0COSm1xtABHZTyz3fvF6p42cTnz1VM0QnfDvMFlIRkSNw==
 
-hardhat-deploy@^0.11.29:
-  version "0.11.29"
-  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.29.tgz#e6d76e37fa2ed74d76d15b01f3849da3bda49a81"
-  integrity sha512-9F+MRFkEocelzB8d+SDDCcTL7edBYAj2S63ldknvfIIBSajeB6q1/jm+dlK1GjcWzAzw7EVoxtjJXzxAxZfZcg==
+hardhat-deploy@^0.11.30:
+  version "0.11.30"
+  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.30.tgz#d47203b584446dce8136ac6d0a96fce2827fb532"
+  integrity sha512-FpMP1zSa24NEARVh/vwFCJJa9Gws3SBRZbVIDYMIvleoH3yOwFcdWY68zfGoxrm4kRHNcaiVNAXVFTm0enKR0A==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-signer" "^5.7.0"
@@ -5166,12 +5166,7 @@ prettier-plugin-solidity@^1.1.3:
     semver "^7.3.8"
     solidity-comments-extractor "^0.0.7"
 
-prettier@^2.1.2, prettier@^2.3.1, prettier@^2.8.3:
-  version "2.8.7"
-  resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.7.tgz#bb79fc8729308549d28fe3a98fce73d2c0656450"
-  integrity sha512-yPngTo3aXUUmyuTjeTUT75txrf+aMh9FiD7q9ZE/i6r0bPb22g4FsE6Y338PQX1bmfy08i9QQCB7/rcUAVntfw==
-
-prettier@^2.8.8:
+prettier@^2.1.2, prettier@^2.3.1, prettier@^2.8.3, prettier@^2.8.8:
   version "2.8.8"
   resolved "https://registry.yarnpkg.com/prettier/-/prettier-2.8.8.tgz#e8c5d7e98a4305ffe3de2e1fc4aca1a71c28b1da"
   integrity sha512-tdN8qQGvNjw4CHbY+XXk0JgCXn9QiF21a55rBe5LJAU+kDyC4WQn4+awm2Xfk2lQMk5fKup9XgzTZtGkjBdP9Q==
@@ -6288,10 +6283,10 @@ type-fest@^0.7.1:
   resolved "https://registry.yarnpkg.com/type-fest/-/type-fest-0.7.1.tgz#8dda65feaf03ed78f0a3f9678f1869147f7c5c48"
   integrity sha512-Ne2YiiGN8bmrmJJEuTWTLJR32nh/JdL1+PSicowtNb0WFpn59GK8/lfD61bVtzguz7b3PBt74nxpv/Pw5po5Rg==
 
-typechain@^8.0.0, typechain@^8.1.0:
-  version "8.1.1"
-  resolved "https://registry.yarnpkg.com/typechain/-/typechain-8.1.1.tgz#9c2e8012c2c4c586536fc18402dcd7034c4ff0bd"
-  integrity sha512-uF/sUvnXTOVF2FHKhQYnxHk4su4JjZR8vr4mA2mBaRwHTbwh0jIlqARz9XJr1tA0l7afJGvEa1dTSi4zt039LQ==
+typechain@^8.0.0, typechain@^8.2.0:
+  version "8.2.0"
+  resolved "https://registry.yarnpkg.com/typechain/-/typechain-8.2.0.tgz#bd4fc8f111d4405e36858bae6f744604617b60f3"
+  integrity sha512-tZqhqjxJ9xAS/Lh32jccTjMkpx7sTdUVVHAy5Bf0TIer5QFNYXotiX74oCvoVYjyxUKDK3MXHtMFzMyD3kE+jg==
   dependencies:
     "@types/prettier" "^2.1.1"
     debug "^4.3.1"

@@ -75,10 +75,9 @@ export default {
     outDir: "typechain"
   },
   circom: {
-    inputBasePath: "./circuits",
-    // (required) The final ptau file, relative to inputBasePath, from a Phase 1 ceremony
+    inputBasePath: "./circuits/",
     ptau: "pot12_final.ptau",
-    // (required) Each object in this array refers to a separate circuit
+    outputBasePath: "./circuits_client/",
     circuits: [
       {
         name: "creditScoreConstraint",

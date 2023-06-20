@@ -81,7 +81,9 @@ export default {
     // (required) Each object in this array refers to a separate circuit
     circuits: [
       {
-        name: "creditScoreConstraint"
+        name: "creditScoreConstraint",
+        circuit: "creditScoreConstraint/creditScoreConstraint.circom",
+        input: "creditScoreConstraint/input.json"
       }
     ]
   }

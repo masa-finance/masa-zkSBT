@@ -12,6 +12,7 @@ import "@typechain/ethers-v5";
 import "@typechain/hardhat";
 import "@primitivefi/hardhat-dodoc";
 import "hardhat-gas-reporter";
+import "hardhat-circom";
 import "solidity-coverage";
 import { NetworksUserConfig } from "hardhat/types";
 
@@ -72,5 +73,16 @@ export default {
   dodoc: {},
   typechain: {
     outDir: "typechain"
+  },
+  circom: {
+    inputBasePath: "./circuits",
+    // (required) The final ptau file, relative to inputBasePath, from a Phase 1 ceremony
+    ptau: "pot12_final.ptau",
+    // (required) Each object in this array refers to a separate circuit
+    circuits: [
+      {
+        name: "creditScoreConstraint"
+      }
+    ]
   }
 };

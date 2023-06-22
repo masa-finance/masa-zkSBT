@@ -22,7 +22,7 @@ const func: DeployFunction = async ({
 
   const constructorArguments = [verifierDeployed.address];
 
-  const verifyCreditScoreDeploymentResult = await deploy("VerifyCreditScore", {
+  const creditScoreVerifyDeploymentResult = await deploy("CreditScoreVerify", {
     from: deployer,
     args: constructorArguments,
     log: true
@@ -32,7 +32,7 @@ const func: DeployFunction = async ({
   if (network.name !== "hardhat") {
     try {
       await hre.run("verify:verify", {
-        address: verifyCreditScoreDeploymentResult.address,
+        address: creditScoreVerifyDeploymentResult.address,
         constructorArguments
       });
     } catch (error) {
@@ -46,6 +46,6 @@ const func: DeployFunction = async ({
   }
 };
 
-func.tags = ["VerifyCreditScore"];
+func.tags = ["CreditScoreVerify"];
 func.dependencies = ["Verifier", "ZKPSBTSelfSovereign", "ZKPSBTAuthority"];
 export default func;

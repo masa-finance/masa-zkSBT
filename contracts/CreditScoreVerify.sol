@@ -21,7 +21,7 @@ interface IZKPSBT is IERC721 {
 /// @title Verify if user is eligible for a loan
 /// @author Masa Finance
 /// @notice Tests if the user is eligible for a loan based on the credit score
-contract VerifyCreditScore {
+contract CreditScoreVerify {
     IVerifier verifier;
 
     mapping(address => uint256) public isElegibleForLoan;

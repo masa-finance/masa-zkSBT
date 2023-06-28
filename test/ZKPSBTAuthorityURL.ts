@@ -38,9 +38,7 @@ const income = 3100;
 const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
 const threshold = 40;
 
-let encryptedCreditScore;
-let encryptedIncome;
-let encryptedReportDate;
+let encryptedJson;
 let hashData;
 let hashDataHex;
 
@@ -94,20 +92,18 @@ describe("ZKP SBT Authority URL", () => {
     ]);
     hashDataHex = "0x" + BigInt(poseidon.F.toString(hashData)).toString(16);
 
+    const json = {
+      address: address1.address,
+      creditScore: creditScore,
+      income: income,
+      reportDate: reportDate
+    }
+    const jsonStr = JSON.stringify(json);
+
     // middleware encrypts data with public key of address1
-    encryptedCreditScore = await encryptWithPublicKey(
+    encryptedJson = await encryptWithPublicKey(
       address1.publicKey,
-      creditScore.toString()
-    );
-
-    encryptedIncome = await encryptWithPublicKey(
-      address1.publicKey,
-      income.toString()
-    );
-
-    encryptedReportDate = await encryptWithPublicKey(
-      address1.publicKey,
-      reportDate.toString()
+      jsonStr
     );
   });
 

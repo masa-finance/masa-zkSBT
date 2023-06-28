@@ -4,10 +4,10 @@ pragma solidity ^0.8.8;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@masa-finance/masa-contracts-identity/contracts/tokens/MasaSBTAuthority.sol";
 
-/// @title ZKP SBT Authority Arweave
+/// @title ZKP SBT Authority URL
 /// @author Masa Finance
-/// @notice Soulbound token implementing ZKP storing data on Arweave
-contract ZKPSBTAuthorityArweave is MasaSBTAuthority, ReentrancyGuard {
+/// @notice Soulbound token implementing ZKP storing data on IPFS/Arweave
+contract ZKPSBTAuthorityURL is MasaSBTAuthority, ReentrancyGuard {
     struct EncryptedData {
         bytes iv; // IV
         bytes ephemPublicKey; // ephemPublicKey
@@ -19,7 +19,7 @@ contract ZKPSBTAuthorityArweave is MasaSBTAuthority, ReentrancyGuard {
     struct SBTData {
         bytes hashData; // hash of ownerAddress+creditScore without encryption, used to verify the data
         // encrypted data with the public key of the owner of the SBT
-        EncryptedData encryptedArweaveUrl; // encrypted Arweave URL
+        EncryptedData encryptedUrl; // encrypted IPFS/Arweave URL
     }
 
     // tokenId => SBTData
@@ -55,28 +55,28 @@ contract ZKPSBTAuthorityArweave is MasaSBTAuthority, ReentrancyGuard {
         return sbtData[tokenId].hashData;
     }
 
-    function getEncryptedArweaveUrl(
+    function getEncryptedUrl(
         uint256 tokenId
     ) external view returns (EncryptedData memory) {
-        return sbtData[tokenId].encryptedArweaveUrl;
+        return sbtData[tokenId].encryptedUrl;
     }
 
     /// @notice Mints a new SBT
     /// @dev The caller must have the MINTER role
     /// @param to The address to mint the SBT to
     /// @param hashData Hash of ownerAddress+creditScore without encryption, used to verify the data
-    /// @param encryptedArweaveUrl Encrypted Arweave URL
+    /// @param encryptedUrl Encrypted IPFS/Arweave URL
     /// @return The SBT ID of the newly minted SBT
     function mint(
         address to,
         bytes calldata hashData,
-        EncryptedData calldata encryptedArweaveUrl
+        EncryptedData calldata encryptedUrl
     ) external payable virtual returns (uint256) {
         uint256 tokenId = _mintWithCounter(address(0), to);
 
         sbtData[tokenId] = SBTData({
             hashData: hashData,
-            encryptedArweaveUrl: encryptedArweaveUrl
+            encryptedUrl: encryptedUrl
         });
 
         emit MintedToAddress(tokenId, to);

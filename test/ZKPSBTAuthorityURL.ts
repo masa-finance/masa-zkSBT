@@ -2,6 +2,7 @@ import chai from "chai";
 import chaiAsPromised from "chai-as-promised";
 import { solidity } from "ethereum-waffle";
 import "@nomiclabs/hardhat-waffle";
+import "@nomiclabs/hardhat-ethers";
 import "hardhat-deploy";
 import { deployments, ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
@@ -20,6 +21,8 @@ import {
 } from "../src/EnvParams";
 
 const buildPoseidon = require("circomlibjs").buildPoseidon;
+console.log(getInfuraIPFSApiKey());
+console.log(getInfuraIPFSApiKeySecret());
 const auth =
   "Basic " +
   Buffer.from(

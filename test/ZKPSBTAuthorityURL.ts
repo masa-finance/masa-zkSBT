@@ -8,8 +8,8 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
   VerifyCreditScore,
   VerifyCreditScore__factory,
-  ZKPSBTAuthorityArweave,
-  ZKPSBTAuthorityArweave__factory
+  ZKPSBTAuthorityURL,
+  ZKPSBTAuthorityURL__factory
 } from "../typechain";
 import { Wallet } from "ethers";
 import publicKeyToAddress from "ethereum-public-key-to-address";
@@ -27,7 +27,7 @@ chai.use(solidity);
 const expect = chai.expect;
 
 // contract instances
-let zkpSBT: ZKPSBTAuthorityArweave;
+let zkpSBT: ZKPSBTAuthorityURL;
 let verifyCreditScore: VerifyCreditScore;
 
 let owner: SignerWithAddress;
@@ -44,7 +44,7 @@ let encryptedReportDate;
 let hashData;
 let hashDataHex;
 
-describe("ZKP SBT Authority Arweave", () => {
+describe("ZKP SBT Authority URL", () => {
   beforeEach(async () => {
     [, owner] = await ethers.getSigners();
 
@@ -54,7 +54,7 @@ describe("ZKP SBT Authority Arweave", () => {
       ethers.provider
     );
 
-    await deployments.fixture("ZKPSBTAuthorityArweave", {
+    await deployments.fixture("ZKPSBTAuthorityURL", {
       fallbackToGlobal: true
     });
     await deployments.fixture("VerifyCreditScore", {
@@ -67,13 +67,13 @@ describe("ZKP SBT Authority Arweave", () => {
     });
 
     const { address: zkpSBTAddress } = await deployments.get(
-      "ZKPSBTAuthorityArweave"
+      "ZKPSBTAuthorityURL"
     );
     const { address: verifyCreditScoreAddress } = await deployments.get(
       "VerifyCreditScore"
     );
 
-    zkpSBT = ZKPSBTAuthorityArweave__factory.connect(zkpSBTAddress, owner);
+    zkpSBT = ZKPSBTAuthorityURL__factory.connect(zkpSBTAddress, owner);
     verifyCreditScore = VerifyCreditScore__factory.connect(
       verifyCreditScoreAddress,
       owner

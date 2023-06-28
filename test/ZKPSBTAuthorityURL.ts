@@ -22,9 +22,9 @@ import {
 const buildPoseidon = require("circomlibjs").buildPoseidon;
 const auth =
   "Basic " +
-  Buffer.from(getInfuraIPFSApiKey() + ":" + getInfuraIPFSApiKeySecret()).toString(
-    "base64"
-  );
+  Buffer.from(
+    getInfuraIPFSApiKey() + ":" + getInfuraIPFSApiKeySecret()
+  ).toString("base64");
 const ipfs = create({
   host: "ipfs.infura.io",
   port: 5001,
@@ -58,6 +58,8 @@ const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
 const threshold = 40;
 
 let encryptedJson;
+let ipfsPath;
+let encryptedIpfsPath;
 let hashData;
 let hashDataHex;
 
@@ -125,7 +127,11 @@ describe("ZKP SBT Authority URL", () => {
     );
 
     const ipfsDoc = await ipfs.add(JSON.stringify(encryptedJson));
-    console.log("ipfsDoc", ipfsDoc);
+    ipfsPath = ipfsDoc.path;
+    encryptedIpfsPath = await encryptWithPublicKey(
+      address1.publicKey,
+      ipfsPath
+    );
   });
 
   describe("sbt information", () => {
@@ -140,13 +146,7 @@ describe("ZKP SBT Authority URL", () => {
     it("should mint from owner", async () => {
       const mintTx = await zkpSBT
         .connect(owner)
-        .mint(
-          address1.address,
-          hashDataHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate
-        );
+        .mint(address1.address, hashDataHex, encryptedIpfsPath);
       const mintReceipt = await mintTx.wait();
 
       const toAddress = mintReceipt.events![1].args![1];
@@ -158,13 +158,7 @@ describe("ZKP SBT Authority URL", () => {
       await expect(
         zkpSBT
           .connect(address1)
-          .mint(
-            address1.address,
-            hashDataHex,
-            encryptedCreditScore,
-            encryptedIncome,
-            encryptedReportDate
-          )
+          .mint(address1.address, hashDataHex, encryptedIpfsPath)
       ).to.be.reverted;
     });
   });
@@ -174,13 +168,7 @@ describe("ZKP SBT Authority URL", () => {
       // we mint
       let mintTx = await zkpSBT
         .connect(owner)
-        .mint(
-          address1.address,
-          hashDataHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate
-        );
+        .mint(address1.address, hashDataHex, encryptedIpfsPath);
       let mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
 
@@ -198,13 +186,7 @@ describe("ZKP SBT Authority URL", () => {
     it("should get a valid token URI from its tokenId", async () => {
       const mintTx = await zkpSBT
         .connect(owner)
-        .mint(
-          address1.address,
-          hashDataHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate
-        );
+        .mint(address1.address, hashDataHex, encryptedIpfsPath);
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
@@ -222,30 +204,32 @@ describe("ZKP SBT Authority URL", () => {
     it("decrypt the data with address1 private key and generate/validate proof", async () => {
       const mintTx = await zkpSBT
         .connect(owner)
-        .mint(
-          address1.address,
-          hashDataHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate
-        );
+        .mint(address1.address, hashDataHex, encryptedIpfsPath);
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
       const sbtData = await zkpSBT.sbtData(tokenId);
 
+      // we decrypt the URL with the private key of address1
+      const decryptedURL = await decryptWithPrivateKey(
+        address1.privateKey,
+        sbtData.encryptedUrl
+      );
+
+      // we get the encrypted data from IPFS
+      const resp = await ipfs.cat(decryptedURL);
+      let content: number[] = [];
+      for await (const chunk of resp) {
+        content = [...content, ...chunk];
+      }
+      const encryptedData = Buffer.from(content).toString("utf8");
+
       // we decrypt the data with the private key of address1
-      const decryptedCreditScore = await decryptWithPrivateKey(
-        address1.privateKey,
-        sbtData.encryptedCreditScore
-      );
-      const decryptedIncome = await decryptWithPrivateKey(
-        address1.privateKey,
-        sbtData.encryptedIncome
-      );
-      const decryptedReportDate = await decryptWithPrivateKey(
-        address1.privateKey,
-        sbtData.encryptedReportDate
+      const decryptedData = JSON.parse(
+        await decryptWithPrivateKey(
+          address1.privateKey,
+          JSON.parse(encryptedData)
+        )
       );
 
       // we check that the hash of the data is the same
@@ -255,26 +239,26 @@ describe("ZKP SBT Authority URL", () => {
           BigInt(
             poseidon.F.toString(
               poseidon([
-                BigInt(address1.address),
-                BigInt(decryptedCreditScore),
-                BigInt(income),
-                BigInt(reportDate)
+                BigInt(decryptedData.address),
+                BigInt(decryptedData.creditScore),
+                BigInt(decryptedData.income),
+                BigInt(decryptedData.reportDate)
               ])
             )
           ).toString(16)
       ).to.equal(sbtData.hashData);
 
       // we check that the data is the same
-      expect(+decryptedCreditScore).to.equal(creditScore);
+      expect(+decryptedData.creditScore).to.equal(creditScore);
 
       // input of ZKP
       const input = {
         hashData: sbtData.hashData,
         ownerAddress: address1.address,
         threshold: threshold,
-        creditScore: +decryptedCreditScore,
-        income: +decryptedIncome,
-        reportDate: +decryptedReportDate
+        creditScore: +decryptedData.creditScore,
+        income: +decryptedData.income,
+        reportDate: +decryptedData.reportDate
       };
 
       // generate ZKP proof
@@ -298,13 +282,7 @@ describe("ZKP SBT Authority URL", () => {
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
       const mintTx = await zkpSBT
         .connect(owner)
-        .mint(
-          address1.address,
-          hashDataHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate
-        );
+        .mint(address1.address, hashDataHex, encryptedIpfsPath);
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();

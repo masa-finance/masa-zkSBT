@@ -1,7 +1,7 @@
 import hre from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { DeployFunction } from "hardhat-deploy/dist/types";
-import { getEnvParams, getPrivateKey } from "../src/EnvParams";
+import { getEnvParams } from "../src/EnvParams";
 
 let admin: SignerWithAddress;
 
@@ -39,8 +39,8 @@ const func: DeployFunction = async ({
     ]
   ];
 
-  const zkpSBTAuthorityArweaveDeploymentResult = await deploy(
-    "ZKPSBTAuthorityArweave",
+  const zkpSBTAuthorityURLDeploymentResult = await deploy(
+    "ZKPSBTAuthorityURL",
     {
       from: deployer,
       args: constructorArguments,
@@ -52,7 +52,7 @@ const func: DeployFunction = async ({
   if (network.name !== "hardhat") {
     try {
       await hre.run("verify:verify", {
-        address: zkpSBTAuthorityArweaveDeploymentResult.address,
+        address: zkpSBTAuthorityURLDeploymentResult.address,
         constructorArguments
       });
     } catch (error) {
@@ -66,6 +66,6 @@ const func: DeployFunction = async ({
   }
 };
 
-func.tags = ["ZKPSBTAuthorityArweave"];
+func.tags = ["ZKPSBTAuthorityURL"];
 func.dependencies = [];
 export default func;

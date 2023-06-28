@@ -1,10 +1,10 @@
-# ZKPSBTAuthorityIPFS
+# ZKPSBTAuthorityArweave
 
 *Masa Finance*
 
-> ZKP SBT Authority IPFS
+> ZKP SBT Authority Arweave
 
-Soulbound token implementing ZKP storing data on IPFS
+Soulbound token implementing ZKP storing data on Arweave
 
 
 
@@ -248,10 +248,10 @@ Returns all available payment methods
 |---|---|---|
 | _0 | address[] | Array of all enabled payment methods |
 
-### getEncryptedIpfsUrl
+### getEncryptedArweaveUrl
 
 ```solidity
-function getEncryptedIpfsUrl(uint256 tokenId) external view returns (struct ZKPSBTAuthorityIPFS.EncryptedData)
+function getEncryptedArweaveUrl(uint256 tokenId) external view returns (struct ZKPSBTAuthorityArweave.EncryptedData)
 ```
 
 
@@ -268,7 +268,7 @@ function getEncryptedIpfsUrl(uint256 tokenId) external view returns (struct ZKPS
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | ZKPSBTAuthorityIPFS.EncryptedData | undefined |
+| _0 | ZKPSBTAuthorityArweave.EncryptedData | undefined |
 
 ### getHashData
 
@@ -673,7 +673,7 @@ function revokeRole(bytes32 role, address account) external nonpayable
 ### sbtData
 
 ```solidity
-function sbtData(uint256) external view returns (bytes hashData, struct ZKPSBTAuthorityIPFS.EncryptedData encryptedIpfsUrl)
+function sbtData(uint256) external view returns (bytes hashData, struct ZKPSBTAuthorityArweave.EncryptedData encryptedArweaveUrl)
 ```
 
 
@@ -691,7 +691,7 @@ function sbtData(uint256) external view returns (bytes hashData, struct ZKPSBTAu
 | Name | Type | Description |
 |---|---|---|
 | hashData | bytes | undefined |
-| encryptedIpfsUrl | ZKPSBTAuthorityIPFS.EncryptedData | undefined |
+| encryptedArweaveUrl | ZKPSBTAuthorityArweave.EncryptedData | undefined |
 
 ### setAddLinkPrice
 

@@ -4,10 +4,10 @@ pragma solidity ^0.8.8;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@masa-finance/masa-contracts-identity/contracts/tokens/MasaSBTAuthority.sol";
 
-/// @title ZKP SBT Authority IPFS
+/// @title ZKP SBT Authority Arweave
 /// @author Masa Finance
-/// @notice Soulbound token implementing ZKP storing data on IPFS
-contract ZKPSBTAuthorityIPFS is MasaSBTAuthority, ReentrancyGuard {
+/// @notice Soulbound token implementing ZKP storing data on Arweave
+contract ZKPSBTAuthorityArweave is MasaSBTAuthority, ReentrancyGuard {
     struct EncryptedData {
         bytes iv; // IV
         bytes ephemPublicKey; // ephemPublicKey
@@ -19,7 +19,7 @@ contract ZKPSBTAuthorityIPFS is MasaSBTAuthority, ReentrancyGuard {
     struct SBTData {
         bytes hashData; // hash of ownerAddress+creditScore without encryption, used to verify the data
         // encrypted data with the public key of the owner of the SBT
-        EncryptedData encryptedIpfsUrl; // encrypted IPFS URL
+        EncryptedData encryptedArweaveUrl; // encrypted Arweave URL
     }
 
     // tokenId => SBTData
@@ -55,9 +55,9 @@ contract ZKPSBTAuthorityIPFS is MasaSBTAuthority, ReentrancyGuard {
         return sbtData[tokenId].hashData;
     }
 
-    function getEncryptedIpfsUrl(
+    function getEncryptedArweaveUrl(
         uint256 tokenId
     ) external view returns (EncryptedData memory) {
-        return sbtData[tokenId].encryptedIpfsUrl;
+        return sbtData[tokenId].encryptedArweaveUrl;
     }
 }

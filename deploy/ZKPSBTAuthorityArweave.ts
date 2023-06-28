@@ -39,8 +39,8 @@ const func: DeployFunction = async ({
     ]
   ];
 
-  const zkpSBTAuthorityIPFSDeploymentResult = await deploy(
-    "ZKPSBTAuthorityIPFS",
+  const zkpSBTAuthorityArweaveDeploymentResult = await deploy(
+    "ZKPSBTAuthorityArweave",
     {
       from: deployer,
       args: constructorArguments,
@@ -52,7 +52,7 @@ const func: DeployFunction = async ({
   if (network.name !== "hardhat") {
     try {
       await hre.run("verify:verify", {
-        address: zkpSBTAuthorityIPFSDeploymentResult.address,
+        address: zkpSBTAuthorityArweaveDeploymentResult.address,
         constructorArguments
       });
     } catch (error) {
@@ -66,6 +66,6 @@ const func: DeployFunction = async ({
   }
 };
 
-func.tags = ["ZKPSBTAuthorityIPFS"];
+func.tags = ["ZKPSBTAuthorityArweave"];
 func.dependencies = [];
 export default func;

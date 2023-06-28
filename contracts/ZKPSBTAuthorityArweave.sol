@@ -60,4 +60,29 @@ contract ZKPSBTAuthorityArweave is MasaSBTAuthority, ReentrancyGuard {
     ) external view returns (EncryptedData memory) {
         return sbtData[tokenId].encryptedArweaveUrl;
     }
+
+    /// @notice Mints a new SBT
+    /// @dev The caller must have the MINTER role
+    /// @param to The address to mint the SBT to
+    /// @param hashData Hash of ownerAddress+creditScore without encryption, used to verify the data
+    /// @param encryptedArweaveUrl Encrypted Arweave URL
+    /// @return The SBT ID of the newly minted SBT
+    function mint(
+        address to,
+        bytes calldata hashData,
+        EncryptedData calldata encryptedArweaveUrl
+    ) external payable virtual returns (uint256) {
+        uint256 tokenId = _mintWithCounter(address(0), to);
+
+        sbtData[tokenId] = SBTData({
+            hashData: hashData,
+            encryptedArweaveUrl: encryptedArweaveUrl
+        });
+
+        emit MintedToAddress(tokenId, to);
+
+        return tokenId;
+    }
+
+    event MintedToAddress(uint256 tokenId, address to);
 }

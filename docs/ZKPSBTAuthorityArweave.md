@@ -461,6 +461,30 @@ function masaToken() external view returns (address)
 |---|---|---|
 | _0 | address | undefined |
 
+### mint
+
+```solidity
+function mint(address to, bytes hashData, ZKPSBTAuthorityArweave.EncryptedData encryptedArweaveUrl) external payable returns (uint256)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| to | address | undefined |
+| hashData | bytes | undefined |
+| encryptedArweaveUrl | ZKPSBTAuthorityArweave.EncryptedData | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
 ### mintPrice
 
 ```solidity
@@ -1162,6 +1186,23 @@ event Mint(address indexed _owner, uint256 indexed _tokenId)
 | _owner `indexed` | address | undefined |
 | _tokenId `indexed` | uint256 | undefined |
 
+### MintedToAddress
+
+```solidity
+event MintedToAddress(uint256 tokenId, address to)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| tokenId  | uint256 | undefined |
+| to  | address | undefined |
+
 ### RoleAdminChanged
 
 ```solidity
@@ -1230,6 +1271,22 @@ error AlreadyAdded()
 
 
 
+
+### InsufficientEthAmount
+
+```solidity
+error InsufficientEthAmount(uint256 amount)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| amount | uint256 | undefined |
 
 ### InvalidPaymentMethod
 
@@ -1301,10 +1358,43 @@ error PaymentParamsNotSet()
 
 
 
+### ProtocolFeeReceiverNotSet
+
+```solidity
+error ProtocolFeeReceiverNotSet()
+```
+
+
+
+
+
+
+### RefundFailed
+
+```solidity
+error RefundFailed()
+```
+
+
+
+
+
+
 ### SameValue
 
 ```solidity
 error SameValue()
+```
+
+
+
+
+
+
+### TransferFailed
+
+```solidity
+error TransferFailed()
 ```
 
 

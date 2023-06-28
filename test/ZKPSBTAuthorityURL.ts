@@ -13,8 +13,27 @@ import {
 } from "../typechain";
 import { Wallet } from "ethers";
 import publicKeyToAddress from "ethereum-public-key-to-address";
+import { create } from "ipfs-http-client";
+import {
+  getInfuraIPFSApiKey,
+  getInfuraIPFSApiKeySecret
+} from "../src/EnvParams";
 
 const buildPoseidon = require("circomlibjs").buildPoseidon;
+const auth =
+  "Basic " +
+  Buffer.from(getInfuraIPFSApiKey() + ":" + getInfuraIPFSApiKeySecret()).toString(
+    "base64"
+  );
+const ipfs = create({
+  host: "ipfs.infura.io",
+  port: 5001,
+  protocol: "https",
+  apiPath: "/api/v0",
+  headers: {
+    authorization: auth
+  }
+});
 
 const {
   encryptWithPublicKey,
@@ -97,14 +116,16 @@ describe("ZKP SBT Authority URL", () => {
       creditScore: creditScore,
       income: income,
       reportDate: reportDate
-    }
-    const jsonStr = JSON.stringify(json);
+    };
 
     // middleware encrypts data with public key of address1
     encryptedJson = await encryptWithPublicKey(
       address1.publicKey,
-      jsonStr
+      JSON.stringify(json)
     );
+
+    const ipfsDoc = await ipfs.add(JSON.stringify(encryptedJson));
+    console.log("ipfsDoc", ipfsDoc);
   });
 
   describe("sbt information", () => {

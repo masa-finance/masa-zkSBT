@@ -1,10 +1,10 @@
-# ZKPSBTAuthorityArweave
+# ZKPSBTAuthorityURL
 
 *Masa Finance*
 
-> ZKP SBT Authority Arweave
+> ZKP SBT Authority URL
 
-Soulbound token implementing ZKP storing data on Arweave
+Soulbound token implementing ZKP storing data on IPFS/Arweave
 
 
 
@@ -248,10 +248,10 @@ Returns all available payment methods
 |---|---|---|
 | _0 | address[] | Array of all enabled payment methods |
 
-### getEncryptedArweaveUrl
+### getEncryptedUrl
 
 ```solidity
-function getEncryptedArweaveUrl(uint256 tokenId) external view returns (struct ZKPSBTAuthorityArweave.EncryptedData)
+function getEncryptedUrl(uint256 tokenId) external view returns (struct ZKPSBTAuthorityURL.EncryptedData)
 ```
 
 
@@ -268,7 +268,7 @@ function getEncryptedArweaveUrl(uint256 tokenId) external view returns (struct Z
 
 | Name | Type | Description |
 |---|---|---|
-| _0 | ZKPSBTAuthorityArweave.EncryptedData | undefined |
+| _0 | ZKPSBTAuthorityURL.EncryptedData | undefined |
 
 ### getHashData
 
@@ -464,7 +464,7 @@ function masaToken() external view returns (address)
 ### mint
 
 ```solidity
-function mint(address to, bytes hashData, ZKPSBTAuthorityArweave.EncryptedData encryptedArweaveUrl) external payable returns (uint256)
+function mint(address to, bytes hashData, ZKPSBTAuthorityURL.EncryptedData encryptedUrl) external payable returns (uint256)
 ```
 
 
@@ -477,7 +477,7 @@ function mint(address to, bytes hashData, ZKPSBTAuthorityArweave.EncryptedData e
 |---|---|---|
 | to | address | undefined |
 | hashData | bytes | undefined |
-| encryptedArweaveUrl | ZKPSBTAuthorityArweave.EncryptedData | undefined |
+| encryptedUrl | ZKPSBTAuthorityURL.EncryptedData | undefined |
 
 #### Returns
 
@@ -697,7 +697,7 @@ function revokeRole(bytes32 role, address account) external nonpayable
 ### sbtData
 
 ```solidity
-function sbtData(uint256) external view returns (bytes hashData, struct ZKPSBTAuthorityArweave.EncryptedData encryptedArweaveUrl)
+function sbtData(uint256) external view returns (bytes hashData, struct ZKPSBTAuthorityURL.EncryptedData encryptedUrl)
 ```
 
 
@@ -715,7 +715,7 @@ function sbtData(uint256) external view returns (bytes hashData, struct ZKPSBTAu
 | Name | Type | Description |
 |---|---|---|
 | hashData | bytes | undefined |
-| encryptedArweaveUrl | ZKPSBTAuthorityArweave.EncryptedData | undefined |
+| encryptedUrl | ZKPSBTAuthorityURL.EncryptedData | undefined |
 
 ### setAddLinkPrice
 

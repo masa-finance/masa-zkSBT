@@ -51,6 +51,6 @@ func.dependencies = [
   "Verifier",
   "ZKPSBTSelfSovereign",
   "ZKPSBTAuthority",
-  "ZKPSBTAuthorityArweave"
+  "ZKPSBTAuthorityURL"
 ];
 export default func;

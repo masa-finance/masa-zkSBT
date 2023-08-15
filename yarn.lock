@@ -635,7 +635,7 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@masa-finance/masa-contracts-identity@^1.6.1", "@masa-finance/masa-contracts-identity@^1.8.4":
+"@masa-finance/masa-contracts-identity@^1.8.3", "@masa-finance/masa-contracts-identity@^1.8.4":
   version "1.8.4"
   resolved "https://registry.yarnpkg.com/@masa-finance/masa-contracts-identity/-/masa-contracts-identity-1.8.4.tgz#d50913b5455870c806f971478604319c7ac81066"
   integrity sha512-OPSeEjYZnsZ3J6iIV0hXNAmV6WKjTKFtdqcReXJpQfRUTfsJzZCswuxRD+GxjUVEpL2fGDW++i9f+A07BFd28Q==
@@ -1242,10 +1242,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^20.4.8":
-  version "20.4.8"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.4.8.tgz#b5dda19adaa473a9bf0ab5cbd8f30ec7d43f5c85"
-  integrity sha512-0mHckf6D2DiIAzh8fM8f3HQCvMKDpK94YQ0DSVkfWTG9BZleYIWudw9cJxX8oCk9bM+vAkDyujDV6dmKHbvQpg==
+"@types/node@*", "@types/node@^20.5.0":
+  version "20.5.0"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.5.0.tgz#7fc8636d5f1aaa3b21e6245e97d56b7f56702313"
+  integrity sha512-Mgq7eCtoTjT89FqNoTzzXg2XvCi5VMhRV6+I2aYanc6kQCBImeNaAYRs/DyoVqk1YEUJK5gN9VO7HRIdz4Wo3Q==
 
 "@types/node@11.11.6":
   version "11.11.6"
@@ -3493,10 +3493,10 @@ hardhat-deploy-ethers@^0.4.0-next.1:
   resolved "https://registry.yarnpkg.com/hardhat-deploy-ethers/-/hardhat-deploy-ethers-0.4.0-next.1.tgz#a5d28b02697cd65eaf445c263b536f21c5eb90cf"
   integrity sha512-e+Tz1elQhMdUsCTVY7bIRHWPR1zElsT6/FvHJnpVXjaKBmLXWmmn2IHq0qQHfjKu5gZ93nuiM66XCkaHhSVGRA==
 
-hardhat-deploy@^0.11.34:
-  version "0.11.34"
-  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.34.tgz#61252ebf5dfdda7b0b31298dd5580b0735c05910"
-  integrity sha512-N6xcwD8LSMV/IyfEr8TfR2YRbOh9Q4QvitR9MKZRTXQmgQiiMGjX+2efMjKgNMxwCVlmpfnE1tyDxOJOOUseLQ==
+hardhat-deploy@^0.11.36:
+  version "0.11.36"
+  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.36.tgz#a0514267edb0b1405139487d889d17e7a91a9dce"
+  integrity sha512-xsegyeI+zYo858rLB09tk/GqlJ4PV5Pr2zbncAhL60WntichKrtizxRchZUr/F7J6ljUYAzTDchNKb5wIYcQqg==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-signer" "^5.7.0"
@@ -5776,10 +5776,10 @@ solhint-plugin-prettier@^0.0.5:
   dependencies:
     prettier-linter-helpers "^1.0.0"
 
-solhint@^3.4.0, solhint@^3.5.1:
-  version "3.5.1"
-  resolved "https://registry.yarnpkg.com/solhint/-/solhint-3.5.1.tgz#3cf47c173f1a223770c3bef719122d6d2d157371"
-  integrity sha512-29+vUIwUmsasKuIzCYOqiKlu4We7+BVYNuoKmDMWsmjfPDoJQpM65eBzYuqEr18lwvXpQAbjTGdzvm4iZIO9Uw==
+solhint@^3.4.0, solhint@^3.6.1:
+  version "3.6.1"
+  resolved "https://registry.yarnpkg.com/solhint/-/solhint-3.6.1.tgz#005b44ad31016e1821e99d2e99b8176c59fa3ebd"
+  integrity sha512-pS7Pl11Ujiew9XWaLDH0U+AFc6iK1RtLV0YETSpjHZXjUaNYi32mY+pi8Ap9vqmNfWodWKtG0bVQpatq84mL4g==
   dependencies:
     "@solidity-parser/parser" "^0.16.0"
     ajv "^6.12.6"

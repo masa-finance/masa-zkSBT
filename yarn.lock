@@ -635,7 +635,7 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@masa-finance/masa-contracts-identity@^1.8.3", "@masa-finance/masa-contracts-identity@^1.8.4":
+"@masa-finance/masa-contracts-identity@^1.8.4":
   version "1.8.4"
   resolved "https://registry.yarnpkg.com/@masa-finance/masa-contracts-identity/-/masa-contracts-identity-1.8.4.tgz#d50913b5455870c806f971478604319c7ac81066"
   integrity sha512-OPSeEjYZnsZ3J6iIV0hXNAmV6WKjTKFtdqcReXJpQfRUTfsJzZCswuxRD+GxjUVEpL2fGDW++i9f+A07BFd28Q==
@@ -5776,10 +5776,10 @@ solhint-plugin-prettier@^0.0.5:
   dependencies:
     prettier-linter-helpers "^1.0.0"
 
-solhint@^3.4.0, solhint@^3.6.1:
-  version "3.6.1"
-  resolved "https://registry.yarnpkg.com/solhint/-/solhint-3.6.1.tgz#005b44ad31016e1821e99d2e99b8176c59fa3ebd"
-  integrity sha512-pS7Pl11Ujiew9XWaLDH0U+AFc6iK1RtLV0YETSpjHZXjUaNYi32mY+pi8Ap9vqmNfWodWKtG0bVQpatq84mL4g==
+solhint@^3.4.0, solhint@^3.6.2:
+  version "3.6.2"
+  resolved "https://registry.yarnpkg.com/solhint/-/solhint-3.6.2.tgz#2b2acbec8fdc37b2c68206a71ba89c7f519943fe"
+  integrity sha512-85EeLbmkcPwD+3JR7aEMKsVC9YrRSxd4qkXuMzrlf7+z2Eqdfm1wHWq1ffTuo5aDhoZxp2I9yF3QkxZOxOL7aQ==
   dependencies:
     "@solidity-parser/parser" "^0.16.0"
     ajv "^6.12.6"

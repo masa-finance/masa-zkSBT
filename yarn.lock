@@ -635,13 +635,7 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@masa-finance/masa-contracts-identity@^1.9.1", "@masa-finance/masa-contracts-identity@^1.9.1":
-  version "1.8.6"
-  resolved "https://registry.yarnpkg.com/@masa-finance/masa-contracts-identity/-/masa-contracts-identity-1.8.6.tgz#71db00dfe56a3176d72bf1680badeb42a23900d3"
-  integrity sha512-YBpup+vqK0TY2Fsd4xzomBg3ocDFI+lzT5Pre4XodAUIKXrpXWZwu2fU2ib5Kjlb91ThYwNgHtWK+lQzYbFzRQ==
-  dependencies:
-    ethers "~5.7.2"
-
+"@masa-finance/masa-contracts-identity@^1.9.0", "@masa-finance/masa-contracts-identity@^1.9.1":
   version "1.9.1"
   resolved "https://registry.yarnpkg.com/@masa-finance/masa-contracts-identity/-/masa-contracts-identity-1.9.1.tgz#21a39ea6a6a0db1e9b30f24e2184c2540f423123"
   integrity sha512-h5Onf78RMw/on6fAEShztvQTsS/Sv+ffyjpUMEIYrUN7HvbJvP2cgdQCp4kKv4c3prQdu9InRx7lDnFdajzM7A==
@@ -3499,10 +3493,10 @@ hardhat-deploy-ethers@^0.4.0-next.1:
   resolved "https://registry.yarnpkg.com/hardhat-deploy-ethers/-/hardhat-deploy-ethers-0.4.0-next.1.tgz#a5d28b02697cd65eaf445c263b536f21c5eb90cf"
   integrity sha512-e+Tz1elQhMdUsCTVY7bIRHWPR1zElsT6/FvHJnpVXjaKBmLXWmmn2IHq0qQHfjKu5gZ93nuiM66XCkaHhSVGRA==
 
-hardhat-deploy@^0.11.36:
-  version "0.11.36"
-  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.36.tgz#a0514267edb0b1405139487d889d17e7a91a9dce"
-  integrity sha512-xsegyeI+zYo858rLB09tk/GqlJ4PV5Pr2zbncAhL60WntichKrtizxRchZUr/F7J6ljUYAzTDchNKb5wIYcQqg==
+hardhat-deploy@^0.11.37:
+  version "0.11.37"
+  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.37.tgz#6a771b859c82ae25292321a6d510d7c0eda09d2b"
+  integrity sha512-pohPSEEo/X9Yfv0Fc0kXBQW6JO0LNOILBGCP69Ci1COJvLht1hLjAtXt/hccyvD9qY/uwJAM75fmsf41Y9N7lg==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-signer" "^5.7.0"

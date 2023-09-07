@@ -1164,10 +1164,10 @@
   dependencies:
     "@types/node" "*"
 
-"@types/chai-as-promised@^7.1.5":
-  version "7.1.5"
-  resolved "https://registry.yarnpkg.com/@types/chai-as-promised/-/chai-as-promised-7.1.5.tgz#6e016811f6c7a64f2eed823191c3a6955094e255"
-  integrity sha512-jStwss93SITGBwt/niYrkf2C+/1KTeZCZl1LaeezTlqppAKeoQC7jxyqYuP72sxBGKCIbw7oHgbYssIRzT5FCQ==
+"@types/chai-as-promised@^7.1.6":
+  version "7.1.6"
+  resolved "https://registry.yarnpkg.com/@types/chai-as-promised/-/chai-as-promised-7.1.6.tgz#3b08cbe1e7206567a480dc6538bade374b19e4e1"
+  integrity sha512-cQLhk8fFarRVZAXUQV1xEnZgMoPxqKojBvRkqPCKPQCzEhpbbSKl1Uu75kDng7k5Ln6LQLUmNBjLlFthCgm1NA==
   dependencies:
     "@types/chai" "*"
 
@@ -1242,10 +1242,10 @@
     "@types/node" "*"
     form-data "^3.0.0"
 
-"@types/node@*", "@types/node@^20.5.7":
-  version "20.5.7"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.5.7.tgz#4b8ecac87fbefbc92f431d09c30e176fc0a7c377"
-  integrity sha512-dP7f3LdZIysZnmvP3ANJYTSwg+wLLl8p7RqniVlV7j+oXSXAbt9h0WIBFmJy5inWZoX9wZN6eXx+YXd9Rh3RBA==
+"@types/node@*", "@types/node@^20.5.9":
+  version "20.5.9"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-20.5.9.tgz#a70ec9d8fa0180a314c3ede0e20ea56ff71aed9a"
+  integrity sha512-PcGNd//40kHAS3sTlzKB9C9XL4K0sTup8nbG5lC14kzEteTNuAFh9u5nA0o5TWnSG2r/JNPRXFVcHJIIeRlmqQ==
 
 "@types/node@11.11.6":
   version "11.11.6"

@@ -40,14 +40,14 @@ contract ZKPSBTAuthority is MasaSBTAuthority, ZKPSBT, ReentrancyGuard {
     /// @notice Mints a new SBT
     /// @dev The caller must have the MINTER role
     /// @param to The address to mint the SBT to
-    /// @param hashData Hash of ownerAddress+creditScore without encryption, used to verify the data
+    /// @param root Root of the Merkle Tree's data without encryption, used to verify the data
     /// @param encryptedCreditScore Encrypted credit score
     /// @param encryptedIncome Encrypted income
     /// @param encryptedReportDate Encrypted report date
     /// @return The SBT ID of the newly minted SBT
     function mint(
         address to,
-        bytes calldata hashData,
+        bytes calldata root,
         EncryptedData calldata encryptedCreditScore,
         EncryptedData calldata encryptedIncome,
         EncryptedData calldata encryptedReportDate
@@ -55,7 +55,7 @@ contract ZKPSBTAuthority is MasaSBTAuthority, ZKPSBT, ReentrancyGuard {
         uint256 tokenId = _mintWithCounter(address(0), to);
 
         sbtData[tokenId] = SBTData({
-            hashData: hashData,
+            root: root,
             encryptedCreditScore: encryptedCreditScore,
             encryptedIncome: encryptedIncome,
             encryptedReportDate: encryptedReportDate

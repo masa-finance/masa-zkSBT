@@ -43,7 +43,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
     /// @param to The address to mint the SBT to
     /// @param authorityAddress Address of the authority that signed the message
     /// @param signatureDate Date of the signature
-    /// @param hashData Hash of ownerAddress+creditScore without encryption, used to verify the data
+    /// @param root Root of the Merkle Tree's data without encryption, used to verify the data
     /// @param encryptedCreditScore Encrypted credit score
     /// @param encryptedIncome Encrypted income
     /// @param encryptedReportDate Encrypted report date
@@ -53,7 +53,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
         address to,
         address authorityAddress,
         uint256 signatureDate,
-        bytes calldata hashData,
+        bytes calldata root,
         EncryptedData calldata encryptedCreditScore,
         EncryptedData calldata encryptedIncome,
         EncryptedData calldata encryptedReportDate,
@@ -65,7 +65,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
             to,
             authorityAddress,
             signatureDate,
-            hashData,
+            root,
             encryptedCreditScore.cipherText,
             encryptedIncome.cipherText,
             encryptedReportDate.cipherText
@@ -80,7 +80,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
         );
 
         sbtData[tokenId] = SBTData({
-            hashData: hashData,
+            root: root,
             encryptedCreditScore: encryptedCreditScore,
             encryptedIncome: encryptedIncome,
             encryptedReportDate: encryptedReportDate
@@ -102,7 +102,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
         address to,
         address authorityAddress,
         uint256 signatureDate,
-        bytes calldata hashData,
+        bytes calldata root,
         bytes calldata encryptedCreditScore,
         bytes calldata encryptedIncome,
         bytes calldata encryptedReportDate
@@ -112,12 +112,12 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
                 keccak256(
                     abi.encode(
                         keccak256(
-                            "Mint(address to,address authorityAddress,uint256 signatureDate,bytes hashData,bytes encryptedCreditScore,bytes encryptedIncome,bytes encryptedReportDate)"
+                            "Mint(address to,address authorityAddress,uint256 signatureDate,bytes root,bytes encryptedCreditScore,bytes encryptedIncome,bytes encryptedReportDate)"
                         ),
                         to,
                         authorityAddress,
                         signatureDate,
-                        keccak256(hashData),
+                        keccak256(root),
                         keccak256(encryptedCreditScore),
                         keccak256(encryptedIncome),
                         keccak256(encryptedReportDate)

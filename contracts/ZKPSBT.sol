@@ -14,7 +14,7 @@ abstract contract ZKPSBT {
 
     // Struct to store the encrypted data with the public key of the owner of the SBT
     struct SBTData {
-        bytes hashData; // hash of ownerAddress+creditScore without encryption, used to verify the data
+        bytes root; // root of the Merkle Tree's data without encryption, used to verify the data
         // encrypted data with the public key of the owner of the SBT
         EncryptedData encryptedCreditScore;
         EncryptedData encryptedIncome;
@@ -24,8 +24,8 @@ abstract contract ZKPSBT {
     // tokenId => SBTData
     mapping(uint256 => SBTData) public sbtData;
 
-    function getHashData(uint256 tokenId) external view returns (bytes memory) {
-        return sbtData[tokenId].hashData;
+    function getRoot(uint256 tokenId) external view returns (bytes memory) {
+        return sbtData[tokenId].root;
     }
 
     function getEncryptedData(

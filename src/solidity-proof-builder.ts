@@ -4,8 +4,7 @@ const snarkjs = require("snarkjs");
 const fs = require("fs");
 
 const wc = require("../circuits/verifyCreditScore_js/witness_calculator");
-const wasm_path =
-  "circuits/verifyCreditScore_js/verifyCreditScore.wasm";
+const wasm_path = "circuits/verifyCreditScore_js/verifyCreditScore.wasm";
 const zkey_path = "circuits/verifyCreditScore_0001.zkey";
 const witness_path = "circuits/witness.wtns";
 

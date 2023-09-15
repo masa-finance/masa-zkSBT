@@ -3,7 +3,7 @@ pragma circom 2.0.0;
 include "../node_modules/circomlib/circuits/comparators.circom";
 include "../node_modules/circomlib/circuits/poseidon.circom";
 
-template creditScoreConstraint() {
+template verifyCreditScore() {
     // public
     signal input hashData;
     signal input ownerAddress;
@@ -33,4 +33,4 @@ template creditScoreConstraint() {
     out === 1;
 }
 
-component main {public [hashData,ownerAddress,threshold]} = creditScoreConstraint();
+component main {public [hashData,ownerAddress,threshold]} = verifyCreditScore();

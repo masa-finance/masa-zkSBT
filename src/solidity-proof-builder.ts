@@ -3,10 +3,9 @@
 const snarkjs = require("snarkjs");
 const fs = require("fs");
 
-const wc = require("../circuits/creditScoreConstraint_js/witness_calculator");
-const wasm_path =
-  "circuits/creditScoreConstraint_js/creditScoreConstraint.wasm";
-const zkey_path = "circuits/creditScoreConstraint_0001.zkey";
+const wc = require("../circuits/verifyCreditScore_js/witness_calculator");
+const wasm_path = "circuits/verifyCreditScore_js/verifyCreditScore.wasm";
+const zkey_path = "circuits/verifyCreditScore_0001.zkey";
 const witness_path = "circuits/witness.wtns";
 
 const generateWitness = async (inputs) => {

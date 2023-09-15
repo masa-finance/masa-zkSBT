@@ -35,12 +35,13 @@ const creditScore = 45;
 const income = 3100;
 const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
 const threshold = 40;
+const operator = 4; // 4 = greater than or equal to
 
 let encryptedCreditScore;
 let encryptedIncome;
 let encryptedReportDate;
-let hashData;
-let hashDataHex;
+let root;
+let rootHex;
 
 describe("ZKP SBT Authority", () => {
   beforeEach(async () => {
@@ -82,13 +83,13 @@ describe("ZKP SBT Authority", () => {
 
     // middleware calculates hash of data
     const poseidon = await buildPoseidon();
-    hashData = poseidon([
+    root = poseidon([
       BigInt(address1.address),
       BigInt(creditScore),
       BigInt(income),
       BigInt(reportDate)
     ]);
-    hashDataHex = "0x" + BigInt(poseidon.F.toString(hashData)).toString(16);
+    rootHex = "0x" + BigInt(poseidon.F.toString(root)).toString(16);
 
     // middleware encrypts data with public key of address1
     encryptedCreditScore = await encryptWithPublicKey(
@@ -121,7 +122,7 @@ describe("ZKP SBT Authority", () => {
         .connect(owner)
         .mint(
           address1.address,
-          hashDataHex,
+          rootHex,
           encryptedCreditScore,
           encryptedIncome,
           encryptedReportDate
@@ -139,7 +140,7 @@ describe("ZKP SBT Authority", () => {
           .connect(address1)
           .mint(
             address1.address,
-            hashDataHex,
+            rootHex,
             encryptedCreditScore,
             encryptedIncome,
             encryptedReportDate
@@ -155,7 +156,7 @@ describe("ZKP SBT Authority", () => {
         .connect(owner)
         .mint(
           address1.address,
-          hashDataHex,
+          rootHex,
           encryptedCreditScore,
           encryptedIncome,
           encryptedReportDate
@@ -179,7 +180,7 @@ describe("ZKP SBT Authority", () => {
         .connect(owner)
         .mint(
           address1.address,
-          hashDataHex,
+          rootHex,
           encryptedCreditScore,
           encryptedIncome,
           encryptedReportDate
@@ -203,7 +204,7 @@ describe("ZKP SBT Authority", () => {
         .connect(owner)
         .mint(
           address1.address,
-          hashDataHex,
+          rootHex,
           encryptedCreditScore,
           encryptedIncome,
           encryptedReportDate
@@ -241,19 +242,24 @@ describe("ZKP SBT Authority", () => {
               ])
             )
           ).toString(16)
-      ).to.equal(sbtData.hashData);
+      ).to.equal(sbtData.root);
 
       // we check that the data is the same
       expect(+decryptedCreditScore).to.equal(creditScore);
 
       // input of ZKP
       const input = {
-        hashData: sbtData.hashData,
-        ownerAddress: address1.address,
+        root: sbtData.root,
+        owner: address1.address,
         threshold: threshold,
-        creditScore: +decryptedCreditScore,
-        income: +decryptedIncome,
-        reportDate: +decryptedReportDate
+        operator: operator,
+        value: +decryptedCreditScore,
+        data: [
+          address1.address,
+          +decryptedCreditScore,
+          +decryptedIncome,
+          +decryptedReportDate
+        ]
       };
 
       // generate ZKP proof
@@ -279,7 +285,7 @@ describe("ZKP SBT Authority", () => {
         .connect(owner)
         .mint(
           address1.address,
-          hashDataHex,
+          rootHex,
           encryptedCreditScore,
           encryptedIncome,
           encryptedReportDate
@@ -291,12 +297,12 @@ describe("ZKP SBT Authority", () => {
 
       // input of ZKP
       const input = {
-        hashData: sbtData.hashData,
-        ownerAddress: address1.address,
+        root: sbtData.root,
+        owner: address1.address,
         threshold: threshold,
-        creditScore: 55, // invalid credit score
-        income: income,
-        reportDate: reportDate
+        operator: operator,
+        value: 55, // invalid credit score
+        data: [address1.address, 55, income, reportDate]
       };
 
       // generate ZKP proof will fail because the hash is not correct

@@ -10,12 +10,12 @@ interface IVerifier {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[4] memory input
+        uint[5] memory input
     ) external view returns (bool);
 }
 
 interface IZKPSBT is IERC721 {
-    function getHashData(uint256 tokenId) external view returns (bytes memory);
+    function getRoot(uint256 tokenId) external view returns (bytes memory);
 }
 
 /// @title Verify if user is eligible for a loan
@@ -36,11 +36,11 @@ contract VerifyCreditScore {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[4] memory publicValues,
+        uint[5] memory publicValues,
         IZKPSBT zkpSBT,
         uint256 sbtTokenId
     ) public {
-        address ownerAddress = address(uint160(publicValues[2]));
+        address owner = address(uint160(publicValues[2]));
         uint256 threshold = publicValues[3];
 
         require(
@@ -50,15 +50,15 @@ contract VerifyCreditScore {
         );
 
         require(
-            zkpSBT.ownerOf(sbtTokenId) == ownerAddress,
+            zkpSBT.ownerOf(sbtTokenId) == owner,
             "The SBT doesn't belong to the address that is trying to claim the loan"
         );
 
-        bytes memory hash = zkpSBT.getHashData(sbtTokenId);
+        bytes memory root = zkpSBT.getRoot(sbtTokenId);
         require(
-            keccak256(abi.encodePacked(hash)) ==
+            keccak256(abi.encodePacked(root)) ==
                 keccak256(abi.encodePacked(publicValues[1])),
-            "The hash of the data doesn't match the hash of the data in the SBT"
+            "The root of the Merkle Tree's data doesn't match the root stored in the SBT"
         );
 
         require(
@@ -68,11 +68,11 @@ contract VerifyCreditScore {
 
         console.log(
             "Address",
-            ownerAddress,
+            owner,
             "is elegible for a loan with a credit score >=",
             threshold
         );
 
-        isElegibleForLoan[ownerAddress] = threshold;
+        isElegibleForLoan[owner] = threshold;
     }
 }

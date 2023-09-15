@@ -37,6 +37,7 @@ const creditScore = 45;
 const income = 3100;
 const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
 const threshold = 40;
+const operator = 4; // 4 = greater than or equal to
 
 let encryptedCreditScore;
 let encryptedIncome;
@@ -317,9 +318,14 @@ describe("ZKP SBT SelfSovereign", () => {
         root: sbtData.root,
         owner: address1.address,
         threshold: threshold,
-        creditScore: +decryptedCreditScore,
-        income: +decryptedIncome,
-        reportDate: +decryptedReportDate
+        operator: operator,
+        value: +decryptedCreditScore,
+        data: [
+          address1.address,
+          +decryptedCreditScore,
+          +decryptedIncome,
+          +decryptedReportDate
+        ]
       };
 
       // generate ZKP proof
@@ -363,9 +369,9 @@ describe("ZKP SBT SelfSovereign", () => {
         root: sbtData.root,
         owner: address1.address,
         threshold: threshold,
-        creditScore: 55, // invalid credit score
-        income: income,
-        reportDate: reportDate
+        operator: operator,
+        value: 55, // invalid credit score
+        data: [address1.address, 55, income, reportDate]
       };
 
       // generate ZKP proof will fail because the hash is not correct

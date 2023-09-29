@@ -66,7 +66,7 @@ const func: DeployFunction = async ({
     }
   }
 
-  if (network.name === "hardhat" || network.name === "goerli") {
+  if (network.name === "hardhat") {
     const signer = env.ADMIN
       ? new ethers.Wallet(getPrivateKey(network.name), ethers.provider)
       : admin;

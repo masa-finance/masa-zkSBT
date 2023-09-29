@@ -168,9 +168,9 @@ describe("ZKP SBT SelfSovereign", () => {
       address1.address,
       authority,
       rootHex,
-      encryptedCreditScore.cipherText,
-      encryptedIncome.cipherText,
-      encryptedReportDate.cipherText
+      encryptedCreditScore.ciphertext,
+      encryptedIncome.ciphertext,
+      encryptedReportDate.ciphertext
     );
   });
 

@@ -8,7 +8,7 @@ const encryptWithPublicKey = async (publicKey, value) => {
   return {
     iv: "0x" + encryptedValue.iv,
     ephemPublicKey: "0x" + encryptedValue.ephemPublicKey,
-    cipherText: "0x" + encryptedValue.ciphertext,
+    ciphertext: "0x" + encryptedValue.ciphertext,
     mac: "0x" + encryptedValue.mac
   };
 };
@@ -19,7 +19,7 @@ const decryptWithPrivateKey = async (privateKey, encryptedValue) => {
     {
       iv: encryptedValue.iv.replace("0x", ""),
       ephemPublicKey: encryptedValue.ephemPublicKey.replace("0x", ""),
-      ciphertext: encryptedValue.cipherText.replace("0x", ""),
+      ciphertext: encryptedValue.ciphertext.replace("0x", ""),
       mac: encryptedValue.mac.replace("0x", "")
     } // encrypted-data
   );

@@ -16,7 +16,7 @@ const func: DeployFunction = async ({
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  [, admin] = await ethers.getSigners();
+  [admin] = await ethers.getSigners();
 
   const verifierDeployed = await deployments.get("Verifier");
 

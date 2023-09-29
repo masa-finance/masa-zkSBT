@@ -93,7 +93,7 @@ const signMint = async (
 
 describe("ZKP SBT SelfSovereign", () => {
   beforeEach(async () => {
-    [, owner, authority] = await ethers.getSigners();
+    [owner, authority] = await ethers.getSigners();
 
     address1 = new ethers.Wallet(
       "0x41c5ab8f659237772a24848aefb3700202ec730c091b3c53affe3f9ebedbc3c9",

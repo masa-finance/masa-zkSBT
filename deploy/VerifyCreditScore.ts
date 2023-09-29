@@ -16,6 +16,8 @@ const func: DeployFunction = async ({
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
+  const currentNonce: number = await ethers.provider.getTransactionCount(deployer);
+
   [admin] = await ethers.getSigners();
 
   const verifierDeployed = await deployments.get("Verifier");
@@ -25,7 +27,8 @@ const func: DeployFunction = async ({
   const verifyCreditScoreDeploymentResult = await deploy("VerifyCreditScore", {
     from: deployer,
     args: constructorArguments,
-    log: true
+    log: true,
+    nonce: currentNonce + 1 // to solve REPLACEMENT_UNDERPRICED, when needed
   });
 
   // verify contract with etherscan, if its not a local network

@@ -66,9 +66,9 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
             authorityAddress,
             signatureDate,
             root,
-            encryptedCreditScore.cipherText,
-            encryptedIncome.cipherText,
-            encryptedReportDate.cipherText
+            encryptedCreditScore.ciphertext,
+            encryptedIncome.ciphertext,
+            encryptedReportDate.ciphertext
         );
 
         uint256 tokenId = _mintWithCounter(

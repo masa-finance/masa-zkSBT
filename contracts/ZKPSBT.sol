@@ -8,7 +8,7 @@ abstract contract ZKPSBT {
     struct EncryptedData {
         bytes iv; // IV
         bytes ephemPublicKey; // ephemPublicKey
-        bytes cipherText; // ciphertext
+        bytes ciphertext; // ciphertext
         bytes mac; // mac
     }
 

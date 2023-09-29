@@ -17,7 +17,7 @@ const func: DeployFunction = async ({
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  [, admin] = await ethers.getSigners();
+  [admin] = await ethers.getSigners();
   const env = getEnvParams(network.name);
   const baseUri = `${env.BASE_URI}`;
 
@@ -66,7 +66,7 @@ const func: DeployFunction = async ({
     }
   }
 
-  if (network.name === "hardhat" || network.name === "goerli") {
+  if (network.name === "hardhat") {
     const signer = env.ADMIN
       ? new ethers.Wallet(getPrivateKey(network.name), ethers.provider)
       : admin;

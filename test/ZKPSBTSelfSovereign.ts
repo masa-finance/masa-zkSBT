@@ -176,7 +176,7 @@ describe("ZKP SBT SelfSovereign", () => {
     it("should be able to get sbt information", async () => {
       expect(await zkSBTSelfSovereign.name()).to.equal("ZKP SBT");
 
-      expect(await zkSBTSelfSovereign.symbol()).to.equal("ZKPSBT");
+      expect(await zkSBTSelfSovereign.symbol()).to.equal("ZKSBT");
     });
   });
 

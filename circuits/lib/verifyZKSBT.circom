@@ -1,8 +1,7 @@
 pragma circom 2.0.0;
 
-include "../../node_modules/circomlib/circuits/comparators.circom";
 include "../../node_modules/circomlib/circuits/poseidon.circom";
-include "../../node_modules/circomlib/circuits/mux3.circom";
+include "./compare.circom";
 
 // length = length of the data array
 // index = index of the data array
@@ -12,11 +11,12 @@ template verifyZKSBT(length, index) {
     signal input owner; // address of the owner of the soulbound token
     signal input threshold;
     signal input operator;
-    // 0 = IsEqual
-    // 1 = LessThan
-    // 2 = LessEqThan
-    // 3 = GreaterThan
-    // 4 = GreaterEqThan
+    // 000: ==
+    // 001: !=
+    // 010: >
+    // 011: >=
+    // 100: <
+    // 101: <=
 
     // private
     signal input value;
@@ -40,43 +40,13 @@ template verifyZKSBT(length, index) {
     // Solution from
     // https://github.com/enricobottazzi/ZK-SBT/blob/b158f1a6ddcd098ee24b5674e0505f99586ad742/iden3-circuits/lib/query/query.circom
 
-    component isEqual = IsEqual();
-    isEqual.in[0] <== value;
-    isEqual.in[1] <== threshold;
-
-    component lessThan = LessThan(252);
-    lessThan.in[0] <== value;
-    lessThan.in[1] <== threshold;
-
-    component lessEqThan = LessEqThan(252);
-    lessEqThan.in[0] <== value;
-    lessEqThan.in[1] <== threshold;
-
-    component greaterThan = GreaterThan(252);
-    greaterThan.in[0] <== value;
-    greaterThan.in[1] <== threshold;
-
-    component greaterEqThan = GreaterEqThan(252);
-    greaterEqThan.in[0] <== value;
-    greaterEqThan.in[1] <== threshold;
-
-    component mux = Mux3();
-    component n2b = Num2Bits(3);
-    n2b.in <== operator;
-
-    mux.s[0] <== n2b.out[0];
-    mux.s[1] <== n2b.out[1];
-    mux.s[2] <== n2b.out[2];
-
-    mux.c[0] <== isEqual.out;
-    mux.c[1] <== lessThan.out;
-    mux.c[2] <== lessEqThan.out;
-    mux.c[3] <== greaterThan.out;
-    mux.c[4] <== greaterEqThan.out;
-    mux.c[5] <== 0; // not in use
-    mux.c[6] <== 0; // not in use
-    mux.c[7] <== 0; // not in use
-
+    // Verifies if the criterion met the field value
+    component cmp = Compare();
+    cmp.a <== value;
+    cmp.b <== threshold;
+    cmp.op <== operator;
+    cmp.out === 1;
+    
     // output
-    out <== mux.out;
+    out <== cmp.out;
 }

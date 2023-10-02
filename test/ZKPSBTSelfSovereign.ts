@@ -380,4 +380,412 @@ describe("ZKP SBT SelfSovereign", () => {
       ).to.be.equal(0);
     });
   });
+
+  describe("test ZKP comparator", () => {
+    let tokenId;
+    let sbtData;
+
+    beforeEach(async () => {
+      const mintTx = await zkpSBTSelfSovereign
+        .connect(address1)
+        .mint(
+          address1.address,
+          authority.address,
+          signatureDate,
+          rootHex,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate,
+          signature
+        );
+
+      const mintReceipt = await mintTx.wait();
+      tokenId = mintReceipt.events![0].args![1].toNumber();
+      sbtData = await zkpSBTSelfSovereign.sbtData(tokenId);
+    });
+
+    it("proof with valid creditScore will succeed (45==45)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 45,
+        operator: 0, // 0 = equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(45);
+    });
+
+    it("proof with valid creditScore will fail (45==40)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 40,
+        operator: 0, // 0 = equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with valid creditScore will succeed (45!=40)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 40,
+        operator: 1, // 1 = different than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(40);
+    });
+
+    it("proof with valid creditScore will fail (45!=45)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 45,
+        operator: 1, // 1 = different than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with valid creditScore will succeed (45>40)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 40,
+        operator: 2, // 2 = greater than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(40);
+    });
+
+    it("proof with valid creditScore will fail (45>45)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 45,
+        operator: 2, // 2 = greater than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with invalid creditScore will fail (45>50)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 50,
+        operator: 2, // 2 = greater than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof will fail because the hash is not correct
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with valid creditScore will succeed (45>=40)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 40,
+        operator: 3, // 3 = greater than or equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(40);
+    });
+
+    it("proof with valid creditScore will succeed (45>=45)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 45,
+        operator: 3, // 3 = greater than or equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(45);
+    });
+
+    it("proof with invalid creditScore will fail (45>=50)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 50,
+        operator: 3, // 3 = greater than or equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof will fail because the hash is not correct
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with valid creditScore will succeed (45<50)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 50,
+        operator: 4, // 4 = less than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(50);
+    });
+
+    it("proof with valid creditScore will fail (45<45)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 45,
+        operator: 4, // 4 = less than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with invalid creditScore will fail (45<40)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 40,
+        operator: 4, // 4 = less than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof will fail because the hash is not correct
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with valid creditScore will succeed (45<=50)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 50,
+        operator: 5, // 5 = less than or equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(50);
+    });
+
+    it("proof with valid creditScore will succeed (45<=45)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 45,
+        operator: 5, // 5 = less than or equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTSelfSovereign.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(45);
+    });
+
+    it("proof with invalid creditScore will fail (45<=40)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 40,
+        operator: 5, // 5 = less than or equal to
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof will fail because the hash is not correct
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+  });
 });

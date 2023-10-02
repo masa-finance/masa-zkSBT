@@ -82,12 +82,7 @@ contract VerifyCreditScore {
             "Proof verification failed"
         );
 
-        console.log(
-            "Address",
-            owner,
-            operatorStr,
-            threshold
-        );
+        console.log("Address", owner, operatorStr, threshold);
 
         isElegibleForLoan[owner] = threshold;
     }

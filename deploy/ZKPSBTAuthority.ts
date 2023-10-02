@@ -40,7 +40,7 @@ const func: DeployFunction = async ({
     ]
   ];
 
-  const zkpSBTAuthorityDeploymentResult = await deploy("ZKPSBTAuthority", {
+  const zkSBTAuthorityDeploymentResult = await deploy("ZKSBTAuthority", {
     from: deployer,
     args: constructorArguments,
     log: true
@@ -50,7 +50,7 @@ const func: DeployFunction = async ({
   if (network.name !== "hardhat") {
     try {
       await hre.run("verify:verify", {
-        address: zkpSBTAuthorityDeploymentResult.address,
+        address: zkSBTAuthorityDeploymentResult.address,
         constructorArguments
       });
     } catch (error) {
@@ -64,6 +64,6 @@ const func: DeployFunction = async ({
   }
 };
 
-func.tags = ["ZKPSBTAuthority"];
+func.tags = ["ZKSBTAuthority"];
 func.dependencies = [];
 export default func;

@@ -332,6 +332,54 @@ describe("ZKP SBT Authority", () => {
       sbtData = await zkpSBTAuthority.sbtData(tokenId);
     });
 
+    it("proof with valid creditScore will succeed (45!=40)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 40,
+        operator: 1, // 1 = different than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      const proof = await genProof(input);
+
+      // check ZKP proof
+      await verifyCreditScore.loanEligible(
+        proof.a,
+        proof.b,
+        proof.c,
+        proof.PubSignals,
+        zkpSBTAuthority.address,
+        tokenId
+      );
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(40);
+    });
+
+    it("proof with valid creditScore will fail (45!=45)", async () => {
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 45,
+        operator: 1, // 1 = different than
+        value: +creditScore,
+        data: [address1.address, +creditScore, +income, +reportDate]
+      };
+
+      // generate ZKP proof
+      await expect(genProof(input)).to.be.rejected;
+
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
     it("proof with valid creditScore will succeed (45>40)", async () => {
       // input of ZKP
       const input = {
@@ -361,7 +409,7 @@ describe("ZKP SBT Authority", () => {
       ).to.be.equal(40);
     });
 
-    it("proof with valid creditScore will succeed (45>45)", async () => {
+    it("proof with valid creditScore will fail (45>45)", async () => {
       // input of ZKP
       const input = {
         root: sbtData.root,

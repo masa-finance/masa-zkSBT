@@ -10,7 +10,7 @@ import "./ZKSBT.sol";
 /// @author Masa Finance
 /// @notice Test Soulbound token
 /// @dev Inherits from the SSSBT contract.
-contract ZKPBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
+contract ZKSBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
     /// @notice Creates a new Test ZKP SBT
     /// @dev Creates a new Test ZKP SBT, inheriting from the Masa SSSBT contract.
     /// @param admin Administrator of the smart contract

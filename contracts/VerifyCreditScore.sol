@@ -14,7 +14,7 @@ interface IVerifier {
     ) external view returns (bool);
 }
 
-interface IZKPSBT is IERC721 {
+interface IZKSBT is IERC721 {
     function getRoot(uint256 tokenId) external view returns (bytes memory);
 }
 
@@ -37,7 +37,7 @@ contract VerifyCreditScore {
         uint[2][2] memory b,
         uint[2] memory c,
         uint[5] memory publicValues,
-        IZKPSBT zkpSBT,
+        IZKSBT zkSBT,
         uint256 sbtTokenId
     ) public {
         address owner = address(uint160(publicValues[2]));
@@ -66,11 +66,11 @@ contract VerifyCreditScore {
         );
 
         require(
-            zkpSBT.ownerOf(sbtTokenId) == owner,
+            zkSBT.ownerOf(sbtTokenId) == owner,
             "The SBT doesn't belong to the address that is trying to claim the loan"
         );
 
-        bytes memory root = zkpSBT.getRoot(sbtTokenId);
+        bytes memory root = zkSBT.getRoot(sbtTokenId);
         require(
             keccak256(abi.encodePacked(root)) ==
                 keccak256(abi.encodePacked(publicValues[1])),

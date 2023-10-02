@@ -4,7 +4,7 @@ pragma solidity ^0.8.8;
 /// @title ZKP SBT
 /// @author Masa Finance
 /// @notice Soulbound token implementing ZKP
-abstract contract ZKPSBT {
+abstract contract ZKSBT {
     struct EncryptedData {
         bytes iv; // IV
         bytes ephemPublicKey; // ephemPublicKey

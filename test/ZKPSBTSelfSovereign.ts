@@ -37,7 +37,7 @@ const creditScore = 45;
 const income = 3100;
 const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
 const threshold = 40;
-const operator = 4; // 4 = greater than or equal to
+const operator = 3; // 3 = greater than or equal to
 
 let encryptedCreditScore;
 let encryptedIncome;

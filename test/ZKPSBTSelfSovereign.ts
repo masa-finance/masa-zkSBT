@@ -36,8 +36,6 @@ const signatureDate = Math.floor(Date.now() / 1000);
 const creditScore = 45;
 const income = 3100;
 const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
-const threshold = 40;
-const operator = 3; // 3 = greater than or equal to
 
 let encryptedCreditScore;
 let encryptedIncome;
@@ -317,8 +315,8 @@ describe("ZKP SBT SelfSovereign", () => {
       const input = {
         root: sbtData.root,
         owner: address1.address,
-        threshold: threshold,
-        operator: operator,
+        threshold: 40,
+        operator: 3, // 3 = greater than or equal to
         value: +decryptedCreditScore,
         data: [
           address1.address,
@@ -343,7 +341,7 @@ describe("ZKP SBT SelfSovereign", () => {
 
       expect(
         await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(threshold);
+      ).to.be.equal(40);
     });
 
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
@@ -368,8 +366,8 @@ describe("ZKP SBT SelfSovereign", () => {
       const input = {
         root: sbtData.root,
         owner: address1.address,
-        threshold: threshold,
-        operator: operator,
+        threshold: 40,
+        operator: 3, // 3 = greater than or equal to
         value: 55, // invalid credit score
         data: [address1.address, 55, income, reportDate]
       };

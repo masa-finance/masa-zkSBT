@@ -34,8 +34,6 @@ let address1: Wallet;
 const creditScore = 45;
 const income = 3100;
 const reportDate = new Date("2023-01-31T20:23:01.804Z").getTime();
-const threshold = 40;
-const operator = 3; // 3 = greater than or equal to
 
 let encryptedCreditScore;
 let encryptedIncome;
@@ -251,8 +249,8 @@ describe("ZKP SBT Authority", () => {
       const input = {
         root: sbtData.root,
         owner: address1.address,
-        threshold: threshold,
-        operator: operator,
+        threshold: 40,
+        operator: 3, // 3 = greater than or equal to
         value: +decryptedCreditScore,
         data: [
           address1.address,
@@ -277,7 +275,7 @@ describe("ZKP SBT Authority", () => {
 
       expect(
         await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(threshold);
+      ).to.be.equal(40);
     });
 
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
@@ -299,8 +297,8 @@ describe("ZKP SBT Authority", () => {
       const input = {
         root: sbtData.root,
         owner: address1.address,
-        threshold: threshold,
-        operator: operator,
+        threshold: 40,
+        operator: 3, // 3 = greater than or equal to
         value: 55, // invalid credit score
         data: [address1.address, 55, income, reportDate]
       };
@@ -308,6 +306,44 @@ describe("ZKP SBT Authority", () => {
       // generate ZKP proof will fail because the hash is not correct
       await expect(genProof(input)).to.be.rejected;
 
+      expect(
+        await verifyCreditScore.isElegibleForLoan(address1.address)
+      ).to.be.equal(0);
+    });
+
+    it("proof with invalid creditScore will fail (< threshold)", async () => {
+      const mintTx = await zkpSBTAuthority
+        .connect(owner)
+        .mint(
+          address1.address,
+          rootHex,
+          encryptedCreditScore,
+          encryptedIncome,
+          encryptedReportDate
+        );
+  
+      const mintReceipt = await mintTx.wait();
+      const tokenId = mintReceipt.events![0].args![1].toNumber();
+      const sbtData = await zkpSBTAuthority.sbtData(tokenId);
+  
+      // input of ZKP
+      const input = {
+        root: sbtData.root,
+        owner: address1.address,
+        threshold: 50,
+        operator: 3, // 3 = greater than or equal to
+        value: +creditScore,
+        data: [
+          address1.address,
+          +creditScore,
+          +income,
+          +reportDate
+        ]
+      };
+  
+      // generate ZKP proof will fail because the hash is not correct
+      await expect(genProof(input)).to.be.rejected;
+  
       expect(
         await verifyCreditScore.isElegibleForLoan(address1.address)
       ).to.be.equal(0);

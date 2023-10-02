@@ -1,5 +1,5 @@
 {
-  "name": "masa-sbt-zkp",
+  "name": "masa-zksbt",
   "version": "1.0.0",
   "main": "dist/typechain/index.js",
   "types": "dist/typechain/index.d.ts",

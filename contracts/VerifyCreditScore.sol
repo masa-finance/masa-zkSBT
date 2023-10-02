@@ -42,6 +42,22 @@ contract VerifyCreditScore {
     ) public {
         address owner = address(uint160(publicValues[2]));
         uint256 threshold = publicValues[3];
+        uint256 operator = publicValues[4];
+        string memory operatorStr;
+
+        if (operator == 0) {
+            operatorStr = "is elegible for a loan with a credit score =";
+        } else if (operator == 1) {
+            operatorStr = "is elegible for a loan with a credit score !=";
+        } else if (operator == 2) {
+            operatorStr = "is elegible for a loan with a credit score >";
+        } else if (operator == 3) {
+            operatorStr = "is elegible for a loan with a credit score >=";
+        } else if (operator == 4) {
+            operatorStr = "is elegible for a loan with a credit score <";
+        } else if (operator == 5) {
+            operatorStr = "is elegible for a loan with a credit score <=";
+        }
 
         require(
             publicValues[0] ==
@@ -69,7 +85,7 @@ contract VerifyCreditScore {
         console.log(
             "Address",
             owner,
-            "is elegible for a loan with a credit score >=",
+            operatorStr,
             threshold
         );
 

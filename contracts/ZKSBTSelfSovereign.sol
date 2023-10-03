@@ -4,13 +4,13 @@ pragma solidity ^0.8.8;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@masa-finance/masa-contracts-identity/contracts/tokens/MasaSBTSelfSovereign.sol";
 
-import "./ZKPSBT.sol";
+import "./ZKSBT.sol";
 
 /// @title Test ZKP SBT Self-Sovereign
 /// @author Masa Finance
 /// @notice Test Soulbound token
 /// @dev Inherits from the SSSBT contract.
-contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
+contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
     /// @notice Creates a new Test ZKP SBT
     /// @dev Creates a new Test ZKP SBT, inheriting from the Masa SSSBT contract.
     /// @param admin Administrator of the smart contract
@@ -35,7 +35,7 @@ contract ZKPSBTSelfSovereign is MasaSBTSelfSovereign, ZKPSBT, ReentrancyGuard {
             soulboundIdentity,
             paymentParams
         )
-        EIP712("ZKPSBTSelfSovereign", "1.0.0")
+        EIP712("ZKSBTSelfSovereign", "1.0.0")
     {}
 
     /// @notice Mints a new SBT

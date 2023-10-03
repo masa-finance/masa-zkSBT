@@ -40,17 +40,20 @@ const func: DeployFunction = async ({
     ]
   ];
 
-  const zkpSBTAuthorityDeploymentResult = await deploy("ZKPSBTAuthority", {
-    from: deployer,
-    args: constructorArguments,
-    log: true
-  });
+  const zkSBTSelfSovereignDeploymentResult = await deploy(
+    "ZKSBTSelfSovereign",
+    {
+      from: deployer,
+      args: constructorArguments,
+      log: true
+    }
+  );
 
   // verify contract with etherscan, if its not a local network
   if (network.name !== "hardhat") {
     try {
       await hre.run("verify:verify", {
-        address: zkpSBTAuthorityDeploymentResult.address,
+        address: zkSBTSelfSovereignDeploymentResult.address,
         constructorArguments
       });
     } catch (error) {
@@ -62,8 +65,24 @@ const func: DeployFunction = async ({
       }
     }
   }
+
+  if (network.name === "hardhat") {
+    const signer = env.ADMIN
+      ? new ethers.Wallet(getPrivateKey(network.name), ethers.provider)
+      : admin;
+
+    const zkSBTSelfSovereign = await ethers.getContractAt(
+      "ZKSBTSelfSovereign",
+      zkSBTSelfSovereignDeploymentResult.address
+    );
+
+    // add authority to ZKSBTSelfSovereign
+    await zkSBTSelfSovereign
+      .connect(signer)
+      .addAuthority(env.AUTHORITY_WALLET || admin.address);
+  }
 };
 
-func.tags = ["ZKPSBTAuthority"];
+func.tags = ["ZKSBTSelfSovereign"];
 func.dependencies = [];
 export default func;

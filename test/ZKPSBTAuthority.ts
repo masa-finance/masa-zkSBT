@@ -6,8 +6,8 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
   VerifyCreditScore,
   VerifyCreditScore__factory,
-  ZKPSBTAuthority,
-  ZKPSBTAuthority__factory
+  ZKSBTAuthority,
+  ZKSBTAuthority__factory
 } from "../typechain";
 import { Wallet } from "ethers";
 import publicKeyToAddress from "ethereum-public-key-to-address";
@@ -25,7 +25,7 @@ chai.use(solidity);
 const expect = chai.expect;
 
 // contract instances
-let zkpSBTAuthority: ZKPSBTAuthority;
+let zkSBTAuthority: ZKSBTAuthority;
 let verifyCreditScore: VerifyCreditScore;
 
 let owner: SignerWithAddress;
@@ -51,7 +51,7 @@ describe("ZKP SBT Authority", () => {
       ethers.provider
     );
 
-    await deployments.fixture("ZKPSBTAuthority", {
+    await deployments.fixture("ZKSBTAuthority", {
       fallbackToGlobal: true
     });
     await deployments.fixture("VerifyCreditScore", {
@@ -63,12 +63,12 @@ describe("ZKP SBT Authority", () => {
       value: ethers.utils.parseEther("1")
     });
 
-    const { address: zkpSBTAddress } = await deployments.get("ZKPSBTAuthority");
+    const { address: zkSBTAddress } = await deployments.get("ZKSBTAuthority");
     const { address: verifyCreditScoreAddress } = await deployments.get(
       "VerifyCreditScore"
     );
 
-    zkpSBTAuthority = ZKPSBTAuthority__factory.connect(zkpSBTAddress, owner);
+    zkSBTAuthority = ZKSBTAuthority__factory.connect(zkSBTAddress, owner);
     verifyCreditScore = VerifyCreditScore__factory.connect(
       verifyCreditScoreAddress,
       owner
@@ -108,15 +108,15 @@ describe("ZKP SBT Authority", () => {
 
   describe("sbt information", () => {
     it("should be able to get sbt information", async () => {
-      expect(await zkpSBTAuthority.name()).to.equal("ZKP SBT");
+      expect(await zkSBTAuthority.name()).to.equal("ZKP SBT");
 
-      expect(await zkpSBTAuthority.symbol()).to.equal("ZKPSBT");
+      expect(await zkSBTAuthority.symbol()).to.equal("ZKSBT");
     });
   });
 
   describe("mint", () => {
     it("should mint from owner", async () => {
-      const mintTx = await zkpSBTAuthority
+      const mintTx = await zkSBTAuthority
         .connect(owner)
         .mint(
           address1.address,
@@ -134,7 +134,7 @@ describe("ZKP SBT Authority", () => {
 
     it("should fail to mint from non minter address", async () => {
       await expect(
-        zkpSBTAuthority
+        zkSBTAuthority
           .connect(address1)
           .mint(
             address1.address,
@@ -150,7 +150,7 @@ describe("ZKP SBT Authority", () => {
   describe("burn", () => {
     it("should burn", async () => {
       // we mint
-      let mintTx = await zkpSBTAuthority
+      let mintTx = await zkSBTAuthority
         .connect(owner)
         .mint(
           address1.address,
@@ -162,11 +162,11 @@ describe("ZKP SBT Authority", () => {
       let mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
 
-      const balanceBefore = await zkpSBTAuthority.balanceOf(address1.address);
+      const balanceBefore = await zkSBTAuthority.balanceOf(address1.address);
 
-      await zkpSBTAuthority.connect(address1).burn(tokenId);
+      await zkSBTAuthority.connect(address1).burn(tokenId);
 
-      expect(await zkpSBTAuthority.balanceOf(address1.address)).to.be.equal(
+      expect(await zkSBTAuthority.balanceOf(address1.address)).to.be.equal(
         balanceBefore.toNumber() - 1
       );
     });
@@ -174,7 +174,7 @@ describe("ZKP SBT Authority", () => {
 
   describe("tokenUri", () => {
     it("should get a valid token URI from its tokenId", async () => {
-      const mintTx = await zkpSBTAuthority
+      const mintTx = await zkSBTAuthority
         .connect(owner)
         .mint(
           address1.address,
@@ -186,7 +186,7 @@ describe("ZKP SBT Authority", () => {
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const tokenUri = await zkpSBTAuthority.tokenURI(tokenId);
+      const tokenUri = await zkSBTAuthority.tokenURI(tokenId);
 
       // check if it's a valid url
       expect(() => new URL(tokenUri)).to.not.throw();
@@ -198,7 +198,7 @@ describe("ZKP SBT Authority", () => {
 
   describe("decrypt data", () => {
     it("decrypt the data with address1 private key and generate/validate proof", async () => {
-      const mintTx = await zkpSBTAuthority
+      const mintTx = await zkSBTAuthority
         .connect(owner)
         .mint(
           address1.address,
@@ -210,7 +210,7 @@ describe("ZKP SBT Authority", () => {
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const sbtData = await zkpSBTAuthority.sbtData(tokenId);
+      const sbtData = await zkSBTAuthority.sbtData(tokenId);
 
       // we decrypt the data with the private key of address1
       const decryptedCreditScore = await decryptWithPrivateKey(
@@ -269,7 +269,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -279,7 +279,7 @@ describe("ZKP SBT Authority", () => {
     });
 
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
-      const mintTx = await zkpSBTAuthority
+      const mintTx = await zkSBTAuthority
         .connect(owner)
         .mint(
           address1.address,
@@ -291,7 +291,7 @@ describe("ZKP SBT Authority", () => {
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const sbtData = await zkpSBTAuthority.sbtData(tokenId);
+      const sbtData = await zkSBTAuthority.sbtData(tokenId);
 
       // input of ZKP
       const input = {
@@ -317,7 +317,7 @@ describe("ZKP SBT Authority", () => {
     let sbtData;
 
     beforeEach(async () => {
-      const mintTx = await zkpSBTAuthority
+      const mintTx = await zkSBTAuthority
         .connect(owner)
         .mint(
           address1.address,
@@ -329,7 +329,7 @@ describe("ZKP SBT Authority", () => {
 
       const mintReceipt = await mintTx.wait();
       tokenId = mintReceipt.events![0].args![1].toNumber();
-      sbtData = await zkpSBTAuthority.sbtData(tokenId);
+      sbtData = await zkSBTAuthority.sbtData(tokenId);
     });
 
     it("proof with valid creditScore will succeed (45==45)", async () => {
@@ -352,7 +352,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -400,7 +400,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -448,7 +448,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -515,7 +515,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -544,7 +544,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -592,7 +592,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -659,7 +659,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 
@@ -688,7 +688,7 @@ describe("ZKP SBT Authority", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTAuthority.address,
+        zkSBTAuthority.address,
         tokenId
       );
 

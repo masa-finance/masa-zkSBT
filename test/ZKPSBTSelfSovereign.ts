@@ -6,8 +6,8 @@ import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
   VerifyCreditScore,
   VerifyCreditScore__factory,
-  ZKPSBTSelfSovereign,
-  ZKPSBTSelfSovereign__factory
+  ZKSBTSelfSovereign,
+  ZKSBTSelfSovereign__factory
 } from "../typechain";
 import { Wallet } from "ethers";
 import publicKeyToAddress from "ethereum-public-key-to-address";
@@ -25,7 +25,7 @@ chai.use(solidity);
 const expect = chai.expect;
 
 // contract instances
-let zkpSBTSelfSovereign: ZKPSBTSelfSovereign;
+let zkSBTSelfSovereign: ZKSBTSelfSovereign;
 let verifyCreditScore: VerifyCreditScore;
 
 let owner: SignerWithAddress;
@@ -57,10 +57,10 @@ const signMint = async (
   const signature = await authoritySigner._signTypedData(
     // Domain
     {
-      name: "ZKPSBTSelfSovereign",
+      name: "ZKSBTSelfSovereign",
       version: "1.0.0",
       chainId: chainId,
-      verifyingContract: zkpSBTSelfSovereign.address
+      verifyingContract: zkSBTSelfSovereign.address
     },
     // Types
     {
@@ -99,7 +99,7 @@ describe("ZKP SBT SelfSovereign", () => {
       ethers.provider
     );
 
-    await deployments.fixture("ZKPSBTSelfSovereign", {
+    await deployments.fixture("ZKSBTSelfSovereign", {
       fallbackToGlobal: true
     });
     await deployments.fixture("VerifyCreditScore", {
@@ -111,15 +111,15 @@ describe("ZKP SBT SelfSovereign", () => {
       value: ethers.utils.parseEther("1")
     });
 
-    const { address: zkpSBTAddress } = await deployments.get(
-      "ZKPSBTSelfSovereign"
+    const { address: zkSBTAddress } = await deployments.get(
+      "ZKSBTSelfSovereign"
     );
     const { address: verifyCreditScoreAddress } = await deployments.get(
       "VerifyCreditScore"
     );
 
-    zkpSBTSelfSovereign = ZKPSBTSelfSovereign__factory.connect(
-      zkpSBTAddress,
+    zkSBTSelfSovereign = ZKSBTSelfSovereign__factory.connect(
+      zkSBTAddress,
       owner
     );
     verifyCreditScore = VerifyCreditScore__factory.connect(
@@ -128,7 +128,7 @@ describe("ZKP SBT SelfSovereign", () => {
     );
 
     // we add authority account
-    await zkpSBTSelfSovereign.addAuthority(authority.address);
+    await zkSBTSelfSovereign.addAuthority(authority.address);
 
     // middleware checks that public key belongs to address1
     expect(publicKeyToAddress(address1.publicKey)).to.be.equal(
@@ -174,15 +174,15 @@ describe("ZKP SBT SelfSovereign", () => {
 
   describe("sbt information", () => {
     it("should be able to get sbt information", async () => {
-      expect(await zkpSBTSelfSovereign.name()).to.equal("ZKP SBT");
+      expect(await zkSBTSelfSovereign.name()).to.equal("ZKP SBT");
 
-      expect(await zkpSBTSelfSovereign.symbol()).to.equal("ZKPSBT");
+      expect(await zkSBTSelfSovereign.symbol()).to.equal("ZKSBT");
     });
   });
 
   describe("mint", () => {
     it("should mint from final user address", async () => {
-      const mintTx = await zkpSBTSelfSovereign
+      const mintTx = await zkSBTSelfSovereign
         .connect(address1)
         .mint(
           address1.address,
@@ -205,7 +205,7 @@ describe("ZKP SBT SelfSovereign", () => {
   describe("burn", () => {
     it("should burn", async () => {
       // we mint
-      let mintTx = await zkpSBTSelfSovereign
+      let mintTx = await zkSBTSelfSovereign
         .connect(address1)
         .mint(
           address1.address,
@@ -220,13 +220,13 @@ describe("ZKP SBT SelfSovereign", () => {
       let mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
 
-      const balanceBefore = await zkpSBTSelfSovereign.balanceOf(
+      const balanceBefore = await zkSBTSelfSovereign.balanceOf(
         address1.address
       );
 
-      await zkpSBTSelfSovereign.connect(address1).burn(tokenId);
+      await zkSBTSelfSovereign.connect(address1).burn(tokenId);
 
-      expect(await zkpSBTSelfSovereign.balanceOf(address1.address)).to.be.equal(
+      expect(await zkSBTSelfSovereign.balanceOf(address1.address)).to.be.equal(
         balanceBefore.toNumber() - 1
       );
     });
@@ -234,7 +234,7 @@ describe("ZKP SBT SelfSovereign", () => {
 
   describe("tokenUri", () => {
     it("should get a valid token URI from its tokenId", async () => {
-      const mintTx = await zkpSBTSelfSovereign
+      const mintTx = await zkSBTSelfSovereign
         .connect(address1)
         .mint(
           address1.address,
@@ -249,7 +249,7 @@ describe("ZKP SBT SelfSovereign", () => {
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const tokenUri = await zkpSBTSelfSovereign.tokenURI(tokenId);
+      const tokenUri = await zkSBTSelfSovereign.tokenURI(tokenId);
 
       // check if it's a valid url
       expect(() => new URL(tokenUri)).to.not.throw();
@@ -261,7 +261,7 @@ describe("ZKP SBT SelfSovereign", () => {
 
   describe("decrypt data", () => {
     it("decrypt the data with address1 private key and generate/validate proof", async () => {
-      const mintTx = await zkpSBTSelfSovereign
+      const mintTx = await zkSBTSelfSovereign
         .connect(address1)
         .mint(
           address1.address,
@@ -276,7 +276,7 @@ describe("ZKP SBT SelfSovereign", () => {
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const sbtData = await zkpSBTSelfSovereign.sbtData(tokenId);
+      const sbtData = await zkSBTSelfSovereign.sbtData(tokenId);
 
       // we decrypt the data with the private key of address1
       const decryptedCreditScore = await decryptWithPrivateKey(
@@ -335,7 +335,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -345,7 +345,7 @@ describe("ZKP SBT SelfSovereign", () => {
     });
 
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
-      const mintTx = await zkpSBTSelfSovereign
+      const mintTx = await zkSBTSelfSovereign
         .connect(address1)
         .mint(
           address1.address,
@@ -360,7 +360,7 @@ describe("ZKP SBT SelfSovereign", () => {
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const sbtData = await zkpSBTSelfSovereign.sbtData(tokenId);
+      const sbtData = await zkSBTSelfSovereign.sbtData(tokenId);
 
       // input of ZKP
       const input = {
@@ -386,7 +386,7 @@ describe("ZKP SBT SelfSovereign", () => {
     let sbtData;
 
     beforeEach(async () => {
-      const mintTx = await zkpSBTSelfSovereign
+      const mintTx = await zkSBTSelfSovereign
         .connect(address1)
         .mint(
           address1.address,
@@ -401,7 +401,7 @@ describe("ZKP SBT SelfSovereign", () => {
 
       const mintReceipt = await mintTx.wait();
       tokenId = mintReceipt.events![0].args![1].toNumber();
-      sbtData = await zkpSBTSelfSovereign.sbtData(tokenId);
+      sbtData = await zkSBTSelfSovereign.sbtData(tokenId);
     });
 
     it("proof with valid creditScore will succeed (45==45)", async () => {
@@ -424,7 +424,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -472,7 +472,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -520,7 +520,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -587,7 +587,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -616,7 +616,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -664,7 +664,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -731,7 +731,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 
@@ -760,7 +760,7 @@ describe("ZKP SBT SelfSovereign", () => {
         proof.b,
         proof.c,
         proof.PubSignals,
-        zkpSBTSelfSovereign.address,
+        zkSBTSelfSovereign.address,
         tokenId
       );
 

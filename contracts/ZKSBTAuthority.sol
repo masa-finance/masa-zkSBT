@@ -4,13 +4,13 @@ pragma solidity ^0.8.8;
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@masa-finance/masa-contracts-identity/contracts/tokens/MasaSBTAuthority.sol";
 
-import "./ZKPSBT.sol";
+import "./ZKSBT.sol";
 
 /// @title Test ZKP SBT Authority
 /// @author Masa Finance
 /// @notice Test Soulbound token
 /// @dev Inherits from the SSSBT contract.
-contract ZKPSBTAuthority is MasaSBTAuthority, ZKPSBT, ReentrancyGuard {
+contract ZKSBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
     /// @notice Creates a new Test ZKP SBT
     /// @dev Creates a new Test ZKP SBT, inheriting from the Masa SSSBT contract.
     /// @param admin Administrator of the smart contract

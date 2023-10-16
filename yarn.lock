@@ -2890,7 +2890,7 @@ ethereumjs-util@^6.0.0, ethereumjs-util@^6.2.1:
     ethjs-util "0.1.6"
     rlp "^2.2.3"
 
-ethers@5.7.2, ethers@^5.0.0, ethers@^5.5.1, ethers@^5.5.3, ethers@^5.7.1, ethers@~5.7.2:
+ethers@5.7.2, ethers@^5.0.0, ethers@^5.5.1, ethers@^5.7.0, ethers@^5.7.1, ethers@~5.7.2:
   version "5.7.2"
   resolved "https://registry.yarnpkg.com/ethers/-/ethers-5.7.2.tgz#3a7deeabbb8c030d4126b24f84e525466145872e"
   integrity sha512-wswUsmWo1aOK8rR7DIKiWSw9DbLWe6x98Jrn8wcTflTVvaXhAMaB5zGAXy0GYQEQp9iO1iSHWVyARQm11zUtyg==
@@ -3486,10 +3486,10 @@ hardhat-deploy-ethers@^0.4.0-next.1:
   resolved "https://registry.yarnpkg.com/hardhat-deploy-ethers/-/hardhat-deploy-ethers-0.4.0-next.1.tgz#a5d28b02697cd65eaf445c263b536f21c5eb90cf"
   integrity sha512-e+Tz1elQhMdUsCTVY7bIRHWPR1zElsT6/FvHJnpVXjaKBmLXWmmn2IHq0qQHfjKu5gZ93nuiM66XCkaHhSVGRA==
 
-hardhat-deploy@^0.11.42:
-  version "0.11.42"
-  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.42.tgz#67a951104c5cbea75b239f9bcb0f866371d1d31d"
-  integrity sha512-sd0zzHV2Px2qxPCvIt0BCJm41rx/aS7ruOOXEUFe54rUk+8ViFNSSUll6BD9YaRzyfVBDMn9FT4Q40DakJ0tJA==
+hardhat-deploy@^0.11.43:
+  version "0.11.43"
+  resolved "https://registry.yarnpkg.com/hardhat-deploy/-/hardhat-deploy-0.11.43.tgz#b22ff15b3ea201b72ba0f17f4b2e182cc950e73e"
+  integrity sha512-D760CjDtinwjOCpKOvdyRtIJYLQIYXmhfgkFe+AkxlYM9bPZ/T4tZ/xIB2tR89ZT+z0hF1YuZFBXIL3/G/9T5g==
   dependencies:
     "@ethersproject/abi" "^5.7.0"
     "@ethersproject/abstract-signer" "^5.7.0"
@@ -3508,7 +3508,7 @@ hardhat-deploy@^0.11.42:
     chokidar "^3.5.2"
     debug "^4.3.2"
     enquirer "^2.3.6"
-    ethers "^5.5.3"
+    ethers "^5.7.0"
     form-data "^4.0.0"
     fs-extra "^10.0.0"
     match-all "^1.2.6"

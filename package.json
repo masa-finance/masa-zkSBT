@@ -49,7 +49,7 @@
     "chai-ethers": "^0.0.1",
     "circomlib": "^2.0.5",
     "circomlibjs": "^0.1.7",
-    "envfile": "^6.18.0",
+    "envfile": "^6.19.0",
     "eth-crypto": "^2.6.0",
     "ethereum-public-key-to-address": "^0.0.5",
     "ethereum-waffle": "^4.0.10",

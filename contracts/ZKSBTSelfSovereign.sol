@@ -47,9 +47,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
     /// @param authorityAddress Address of the authority that signed the message
     /// @param signatureDate Date of the signature
     /// @param root Root of the Merkle Tree's data without encryption, used to verify the data
-    /// @param encryptedCreditScore Encrypted credit score
-    /// @param encryptedIncome Encrypted income
-    /// @param encryptedReportDate Encrypted report date
+    /// @param encryptedData Encrypted data
     /// @param signature Signature of the message
     /// @return The SBT ID of the newly minted SBT
     function mint(
@@ -57,9 +55,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
         address authorityAddress,
         uint256 signatureDate,
         bytes calldata root,
-        EncryptedData calldata encryptedCreditScore,
-        EncryptedData calldata encryptedIncome,
-        EncryptedData calldata encryptedReportDate,
+        bytes[] memory encryptedData,
         bytes calldata signature
     ) external payable virtual returns (uint256) {
         if (to != _msgSender()) revert CallerNotOwner(_msgSender());
@@ -69,9 +65,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
             authorityAddress,
             signatureDate,
             root,
-            encryptedCreditScore.ciphertext,
-            encryptedIncome.ciphertext,
-            encryptedReportDate.ciphertext
+            encryptedData
         );
 
         uint256 tokenId = _mintWithCounter(
@@ -83,12 +77,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
             signature
         );
 
-        sbtData[tokenId] = SBTData({
-            root: root,
-            encryptedCreditScore: encryptedCreditScore,
-            encryptedIncome: encryptedIncome,
-            encryptedReportDate: encryptedReportDate
-        });
+        sbtData[tokenId] = SBTData({root: root, encryptedData: encryptedData});
 
         emit MintedToAddress(
             tokenId,
@@ -107,9 +96,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
         address authorityAddress,
         uint256 signatureDate,
         bytes calldata root,
-        bytes calldata encryptedCreditScore,
-        bytes calldata encryptedIncome,
-        bytes calldata encryptedReportDate
+        bytes[] memory encryptedData
     ) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
@@ -122,9 +109,9 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
                         authorityAddress,
                         signatureDate,
                         keccak256(root),
-                        keccak256(encryptedCreditScore),
-                        keccak256(encryptedIncome),
-                        keccak256(encryptedReportDate)
+                        keccak256(encryptedData[0]),
+                        keccak256(encryptedData[1]),
+                        keccak256(encryptedData[2])
                     )
                 )
             );

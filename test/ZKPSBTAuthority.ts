@@ -3,10 +3,7 @@ import chaiAsPromised from "chai-as-promised";
 import { solidity } from "ethereum-waffle";
 import { deployments, ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import {
-  ZKSBTAuthority,
-  ZKSBTAuthority__factory
-} from "../typechain";
+import { ZKSBTAuthority, ZKSBTAuthority__factory } from "../typechain";
 import { Wallet } from "ethers";
 import publicKeyToAddress from "ethereum-public-key-to-address";
 

@@ -44,28 +44,26 @@ contract ZKSBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
     /// @dev The caller must have the MINTER role
     /// @param to The address to mint the SBT to
     /// @param root Root of the Merkle Tree's data without encryption, used to verify the data
-    /// @param encryptedCreditScore Encrypted credit score
-    /// @param encryptedIncome Encrypted income
-    /// @param encryptedReportDate Encrypted report date
+    /// @param encryptedData Encrypted data
     /// @return The SBT ID of the newly minted SBT
     function mint(
         address to,
         bytes calldata root,
-        EncryptedData calldata encryptedCreditScore,
-        EncryptedData calldata encryptedIncome,
-        EncryptedData calldata encryptedReportDate
+        bytes[] memory encryptedData
     ) external payable virtual returns (uint256) {
         uint256 tokenId = _mintWithCounter(address(0), to);
 
-        sbtData[tokenId] = SBTData({
-            root: root,
-            encryptedCreditScore: encryptedCreditScore,
-            encryptedIncome: encryptedIncome,
-            encryptedReportDate: encryptedReportDate
-        });
+        sbtData[tokenId] = SBTData({root: root, encryptedData: encryptedData});
 
         emit MintedToAddress(tokenId, to);
 
         return tokenId;
+    }
+
+    function _mintWithCounter(
+        address paymentMethod,
+        address to
+    ) internal virtual override(MasaSBT, MasaSBTAuthority) returns (uint256) {
+        return MasaSBTAuthority._mintWithCounter(paymentMethod, to);
     }
 }

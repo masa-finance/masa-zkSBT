@@ -4,8 +4,6 @@ import { solidity } from "ethereum-waffle";
 import { deployments, ethers } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  VerifyCreditScore,
-  VerifyCreditScore__factory,
   ZKSBTAuthority,
   ZKSBTAuthority__factory
 } from "../typechain";
@@ -26,7 +24,6 @@ const expect = chai.expect;
 
 // contract instances
 let zkSBTAuthority: ZKSBTAuthority;
-let verifyCreditScore: VerifyCreditScore;
 
 let owner: SignerWithAddress;
 let address1: Wallet;
@@ -54,9 +51,6 @@ describe("ZKP SBT Authority", () => {
     await deployments.fixture("ZKSBTAuthority", {
       fallbackToGlobal: true
     });
-    await deployments.fixture("VerifyCreditScore", {
-      fallbackToGlobal: true
-    });
 
     await owner.sendTransaction({
       to: address1.address,
@@ -64,15 +58,8 @@ describe("ZKP SBT Authority", () => {
     });
 
     const { address: zkSBTAddress } = await deployments.get("ZKSBTAuthority");
-    const { address: verifyCreditScoreAddress } = await deployments.get(
-      "VerifyCreditScore"
-    );
 
     zkSBTAuthority = ZKSBTAuthority__factory.connect(zkSBTAddress, owner);
-    verifyCreditScore = VerifyCreditScore__factory.connect(
-      verifyCreditScoreAddress,
-      owner
-    );
 
     // middleware checks that public key belongs to address1
     expect(publicKeyToAddress(address1.publicKey)).to.be.equal(

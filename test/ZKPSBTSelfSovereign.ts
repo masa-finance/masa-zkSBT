@@ -4,8 +4,6 @@ import { solidity } from "ethereum-waffle";
 import { deployments, ethers, getChainId } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import {
-  VerifyCreditScore,
-  VerifyCreditScore__factory,
   ZKSBTSelfSovereign,
   ZKSBTSelfSovereign__factory
 } from "../typechain";
@@ -26,7 +24,6 @@ const expect = chai.expect;
 
 // contract instances
 let zkSBTSelfSovereign: ZKSBTSelfSovereign;
-let verifyCreditScore: VerifyCreditScore;
 
 let owner: SignerWithAddress;
 let authority: SignerWithAddress;
@@ -102,9 +99,6 @@ describe("ZKP SBT SelfSovereign", () => {
     await deployments.fixture("ZKSBTSelfSovereign", {
       fallbackToGlobal: true
     });
-    await deployments.fixture("VerifyCreditScore", {
-      fallbackToGlobal: true
-    });
 
     await owner.sendTransaction({
       to: address1.address,
@@ -114,16 +108,9 @@ describe("ZKP SBT SelfSovereign", () => {
     const { address: zkSBTAddress } = await deployments.get(
       "ZKSBTSelfSovereign"
     );
-    const { address: verifyCreditScoreAddress } = await deployments.get(
-      "VerifyCreditScore"
-    );
 
     zkSBTSelfSovereign = ZKSBTSelfSovereign__factory.connect(
       zkSBTAddress,
-      owner
-    );
-    verifyCreditScore = VerifyCreditScore__factory.connect(
-      verifyCreditScoreAddress,
       owner
     );
 
@@ -330,7 +317,7 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
+      await zkSBTSelfSovereign.loanEligible(
         proof.a,
         proof.b,
         proof.c,

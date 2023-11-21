@@ -21,10 +21,13 @@ const func: DeployFunction = async ({
   const env = getEnvParams(network.name);
   const baseUri = `${env.BASE_URI}`;
 
+  const verifierDeployed = await deployments.get("Verifier");
+
   const constructorArguments = [
     env.ADMIN || admin.address,
     env.SBT_NAME,
     env.SBT_SYMBOL,
+    verifierDeployed.address,
     baseUri,
     ethers.constants.AddressZero,
     [
@@ -85,5 +88,5 @@ const func: DeployFunction = async ({
 };
 
 func.tags = ["ZKSBTSelfSovereign"];
-func.dependencies = [];
+func.dependencies = ["Verifier"];
 export default func;

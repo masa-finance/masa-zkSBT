@@ -1,29 +1,35 @@
-import EthCrypto from "eth-crypto";
+const ecies = require("ecies-geth");
+const ethUtil = require("ethereumjs-util");
 
-const encryptWithPublicKey = async (publicKey, value) => {
-  const encryptedValue = await EthCrypto.encryptWithPublicKey(
-    publicKey.replace("0x", ""), // publicKey
-    value // message JSON.stringify(data)
-  );
-  return {
-    iv: "0x" + encryptedValue.iv,
-    ephemPublicKey: "0x" + encryptedValue.ephemPublicKey,
-    ciphertext: "0x" + encryptedValue.ciphertext,
-    mac: "0x" + encryptedValue.mac
-  };
+const toBuffer = (value: any) => {
+  if (typeof value === "string") {
+    return Buffer.from(value);
+  } else {
+    return Buffer.from(value.toString());
+  }
 };
 
-const decryptWithPrivateKey = async (privateKey, encryptedValue) => {
-  const decryptedValue = await EthCrypto.decryptWithPrivateKey(
-    privateKey.replace("0x", ""), // privateKey
-    {
-      iv: encryptedValue.iv.replace("0x", ""),
-      ephemPublicKey: encryptedValue.ephemPublicKey.replace("0x", ""),
-      ciphertext: encryptedValue.ciphertext.replace("0x", ""),
-      mac: encryptedValue.mac.replace("0x", "")
-    } // encrypted-data
-  );
-  return decryptedValue;
+const encryptWithPublicKey = async (publicKey: string, value: any) => {
+  // Convert the public key to a buffer
+  const publicKeyBuffer = ethUtil.toBuffer(publicKey);
+  // Convert the value to a buffer
+  const valueBuffer = toBuffer(value);
+
+  // Encrypt the message
+  const encryptedMessage = await ecies.encrypt(publicKeyBuffer, valueBuffer);
+
+  return "0x" + encryptedMessage.toString("hex");
+};
+
+const decryptWithPrivateKey = async (privateKey: string, valueHex: string) => {
+  // Convert the private key to a buffer
+  const privateKeyBuffer = ethUtil.toBuffer(privateKey);
+  // Convert the value in hex to a buffer
+  const valueBuffer = Buffer.from(valueHex.slice(2), "hex");
+
+  // Decrypt the message
+  const decryptedMessage = await ecies.decrypt(privateKeyBuffer, valueBuffer);
+  return decryptedMessage.toString();
 };
 
 module.exports = {

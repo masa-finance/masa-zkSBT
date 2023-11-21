@@ -19,13 +19,15 @@ contract ZKSBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
     /// @param baseTokenURI Base URI of the token
     /// @param soulboundIdentity Address of the SoulboundIdentity contract
     /// @param paymentParams Payment gateway params
+    /// @param maxSBTToMint Maximum number of SBT that can be minted
     constructor(
         address admin,
         string memory name,
         string memory symbol,
         string memory baseTokenURI,
         address soulboundIdentity,
-        PaymentParams memory paymentParams
+        PaymentParams memory paymentParams,
+        uint256 maxSBTToMint
     )
         MasaSBTAuthority(
             admin,
@@ -33,7 +35,8 @@ contract ZKSBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
             symbol,
             baseTokenURI,
             soulboundIdentity,
-            paymentParams
+            paymentParams,
+            maxSBTToMint
         )
     {}
 
@@ -65,6 +68,4 @@ contract ZKSBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
 
         return tokenId;
     }
-
-    event MintedToAddress(uint256 tokenId, address to);
 }

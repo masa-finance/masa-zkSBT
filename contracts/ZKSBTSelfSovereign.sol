@@ -16,6 +16,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
     /// @param admin Administrator of the smart contract
     /// @param name Name of the token
     /// @param symbol Symbol of the token
+    /// @param verifier Verifier smart contract
     /// @param baseTokenURI Base URI of the token
     /// @param soulboundIdentity Address of the SoulboundIdentity contract
     /// @param paymentParams Payment gateway params
@@ -24,6 +25,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
         address admin,
         string memory name,
         string memory symbol,
+        IVerifier verifier,
         string memory baseTokenURI,
         address soulboundIdentity,
         PaymentParams memory paymentParams,
@@ -39,7 +41,9 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
             maxSBTToMint
         )
         EIP712("ZKSBTSelfSovereign", "1.0.0")
-    {}
+    {
+        _verifier = verifier;
+    }
 
     /// @notice Mints a new SBT
     /// @dev The caller must have the MINTER role

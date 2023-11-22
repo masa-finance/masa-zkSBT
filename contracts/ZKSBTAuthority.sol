@@ -54,7 +54,7 @@ contract ZKSBTAuthority is MasaSBTAuthority, ZKSBT, ReentrancyGuard {
         address to,
         bytes calldata root,
         bytes[] memory encryptedData
-    ) external payable virtual returns (uint256) {
+    ) external payable virtual override returns (uint256) {
         uint256 tokenId = _mintWithCounter(address(0), to);
 
         sbtData[tokenId] = SBTData({root: root, encryptedData: encryptedData});

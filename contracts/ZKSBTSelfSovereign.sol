@@ -45,6 +45,14 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
         _verifier = verifier;
     }
 
+    function mint(
+        address,
+        bytes calldata,
+        bytes[] memory
+    ) external payable virtual override returns (uint256) {
+        revert("Function not implemented");
+    }
+
     /// @notice Mints a new SBT
     /// @dev The caller must have the MINTER role
     /// @param to The address to mint the SBT to

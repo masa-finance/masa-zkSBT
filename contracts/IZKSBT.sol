@@ -8,11 +8,11 @@ interface IZKSBT {
         uint256 tokenId
     ) external view returns (bytes[] memory);
 
-    /* function mint(
+    function mint(
         address to,
         bytes memory root,
         bytes[] memory encryptedData
-    ) external payable returns (uint256); */
+    ) external payable returns (uint256);
 
     function verifyProof(
         uint256 tokenId,

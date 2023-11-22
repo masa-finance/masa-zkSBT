@@ -564,6 +564,30 @@ function maxSBTToMint() external view returns (uint256)
 ### mint
 
 ```solidity
+function mint(address, bytes, bytes[]) external payable returns (uint256)
+```
+
+
+
+
+
+#### Parameters
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | address | undefined |
+| _1 | bytes | undefined |
+| _2 | bytes[] | undefined |
+
+#### Returns
+
+| Name | Type | Description |
+|---|---|---|
+| _0 | uint256 | undefined |
+
+### mint
+
+```solidity
 function mint(address to, address authorityAddress, uint256 signatureDate, bytes root, bytes[] encryptedData, bytes signature) external payable returns (uint256)
 ```
 

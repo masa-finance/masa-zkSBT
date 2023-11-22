@@ -166,15 +166,17 @@ describe("ZKP SBT SelfSovereign", () => {
 
   describe("mint", () => {
     it("should mint from final user address", async () => {
-      const mintTx = await zkSBTSelfSovereign.connect(address1).mint(
-        address1.address,
-        authority.address,
-        signatureDate,
-        rootHex,
-        [encryptedCreditScore, encryptedIncome, encryptedReportDate],
+      const mintTx = await zkSBTSelfSovereign
+        .connect(address1)
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
+          address1.address,
+          authority.address,
+          signatureDate,
+          rootHex,
+          [encryptedCreditScore, encryptedIncome, encryptedReportDate],
 
-        signature
-      );
+          signature
+        );
       const mintReceipt = await mintTx.wait();
 
       const toAddress = mintReceipt.events![1].args![1];
@@ -188,7 +190,7 @@ describe("ZKP SBT SelfSovereign", () => {
       // we mint
       let mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
@@ -215,7 +217,7 @@ describe("ZKP SBT SelfSovereign", () => {
     it("should get a valid token URI from its tokenId", async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
@@ -240,7 +242,7 @@ describe("ZKP SBT SelfSovereign", () => {
     it("decrypt the data with address1 private key and generate/validate proof", async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
@@ -318,7 +320,7 @@ describe("ZKP SBT SelfSovereign", () => {
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
@@ -353,7 +355,7 @@ describe("ZKP SBT SelfSovereign", () => {
     beforeEach(async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,

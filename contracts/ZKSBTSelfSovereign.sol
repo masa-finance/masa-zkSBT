@@ -16,6 +16,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
     /// @param admin Administrator of the smart contract
     /// @param name Name of the token
     /// @param symbol Symbol of the token
+    /// @param verifier Verifier smart contract
     /// @param baseTokenURI Base URI of the token
     /// @param soulboundIdentity Address of the SoulboundIdentity contract
     /// @param paymentParams Payment gateway params
@@ -24,6 +25,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
         address admin,
         string memory name,
         string memory symbol,
+        IVerifier verifier,
         string memory baseTokenURI,
         address soulboundIdentity,
         PaymentParams memory paymentParams,
@@ -39,7 +41,17 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
             maxSBTToMint
         )
         EIP712("ZKSBTSelfSovereign", "1.0.0")
-    {}
+    {
+        _verifier = verifier;
+    }
+
+    function mint(
+        address,
+        bytes calldata,
+        bytes[] memory
+    ) external payable virtual override returns (uint256) {
+        revert("Function not implemented");
+    }
 
     /// @notice Mints a new SBT
     /// @dev The caller must have the MINTER role
@@ -47,9 +59,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
     /// @param authorityAddress Address of the authority that signed the message
     /// @param signatureDate Date of the signature
     /// @param root Root of the Merkle Tree's data without encryption, used to verify the data
-    /// @param encryptedCreditScore Encrypted credit score
-    /// @param encryptedIncome Encrypted income
-    /// @param encryptedReportDate Encrypted report date
+    /// @param encryptedData Encrypted data
     /// @param signature Signature of the message
     /// @return The SBT ID of the newly minted SBT
     function mint(
@@ -57,9 +67,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
         address authorityAddress,
         uint256 signatureDate,
         bytes calldata root,
-        EncryptedData calldata encryptedCreditScore,
-        EncryptedData calldata encryptedIncome,
-        EncryptedData calldata encryptedReportDate,
+        bytes[] memory encryptedData,
         bytes calldata signature
     ) external payable virtual returns (uint256) {
         if (to != _msgSender()) revert CallerNotOwner(_msgSender());
@@ -69,9 +77,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
             authorityAddress,
             signatureDate,
             root,
-            encryptedCreditScore.ciphertext,
-            encryptedIncome.ciphertext,
-            encryptedReportDate.ciphertext
+            encryptedData
         );
 
         uint256 tokenId = _mintWithCounter(
@@ -83,12 +89,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
             signature
         );
 
-        sbtData[tokenId] = SBTData({
-            root: root,
-            encryptedCreditScore: encryptedCreditScore,
-            encryptedIncome: encryptedIncome,
-            encryptedReportDate: encryptedReportDate
-        });
+        sbtData[tokenId] = SBTData({root: root, encryptedData: encryptedData});
 
         emit MintedToAddress(
             tokenId,
@@ -107,9 +108,7 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
         address authorityAddress,
         uint256 signatureDate,
         bytes calldata root,
-        bytes calldata encryptedCreditScore,
-        bytes calldata encryptedIncome,
-        bytes calldata encryptedReportDate
+        bytes[] memory encryptedData
     ) internal view returns (bytes32) {
         return
             _hashTypedDataV4(
@@ -122,9 +121,9 @@ contract ZKSBTSelfSovereign is MasaSBTSelfSovereign, ZKSBT, ReentrancyGuard {
                         authorityAddress,
                         signatureDate,
                         keccak256(root),
-                        keccak256(encryptedCreditScore),
-                        keccak256(encryptedIncome),
-                        keccak256(encryptedReportDate)
+                        keccak256(encryptedData[0]),
+                        keccak256(encryptedData[1]),
+                        keccak256(encryptedData[2])
                     )
                 )
             );

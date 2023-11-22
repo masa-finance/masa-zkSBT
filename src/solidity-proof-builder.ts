@@ -19,19 +19,10 @@ const genProof = async (input) => {
 
   const argv = solidityCallData.replace(/["[\]\s]/g, "").split(",");
 
-  const a = [argv[0], argv[1]];
-  const b = [
-    [argv[2], argv[3]],
-    [argv[4], argv[5]]
-  ];
-  const c = [argv[6], argv[7]];
-  const PubSignals: any[] = [];
+  const Proof = argv.slice(0, 8);
+  const PubSignals = argv.slice(8);
 
-  for (let i = 8; i < argv.length; i++) {
-    PubSignals.push(argv[i]);
-  }
-
-  return { a, b, c, PubSignals };
+  return { Proof, PubSignals };
 };
 
 module.exports = {

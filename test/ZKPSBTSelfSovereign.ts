@@ -3,12 +3,7 @@ import chaiAsPromised from "chai-as-promised";
 import { solidity } from "ethereum-waffle";
 import { deployments, ethers, getChainId } from "hardhat";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
-import {
-  VerifyCreditScore,
-  VerifyCreditScore__factory,
-  ZKSBTSelfSovereign,
-  ZKSBTSelfSovereign__factory
-} from "../typechain";
+import { ZKSBTSelfSovereign, ZKSBTSelfSovereign__factory } from "../typechain";
 import { Wallet } from "ethers";
 import publicKeyToAddress from "ethereum-public-key-to-address";
 
@@ -26,7 +21,6 @@ const expect = chai.expect;
 
 // contract instances
 let zkSBTSelfSovereign: ZKSBTSelfSovereign;
-let verifyCreditScore: VerifyCreditScore;
 
 let owner: SignerWithAddress;
 let authority: SignerWithAddress;
@@ -102,9 +96,6 @@ describe("ZKP SBT SelfSovereign", () => {
     await deployments.fixture("ZKSBTSelfSovereign", {
       fallbackToGlobal: true
     });
-    await deployments.fixture("VerifyCreditScore", {
-      fallbackToGlobal: true
-    });
 
     await owner.sendTransaction({
       to: address1.address,
@@ -114,16 +105,9 @@ describe("ZKP SBT SelfSovereign", () => {
     const { address: zkSBTAddress } = await deployments.get(
       "ZKSBTSelfSovereign"
     );
-    const { address: verifyCreditScoreAddress } = await deployments.get(
-      "VerifyCreditScore"
-    );
 
     zkSBTSelfSovereign = ZKSBTSelfSovereign__factory.connect(
       zkSBTAddress,
-      owner
-    );
-    verifyCreditScore = VerifyCreditScore__factory.connect(
-      verifyCreditScoreAddress,
       owner
     );
 
@@ -166,9 +150,9 @@ describe("ZKP SBT SelfSovereign", () => {
       address1.address,
       authority,
       rootHex,
-      encryptedCreditScore.ciphertext,
-      encryptedIncome.ciphertext,
-      encryptedReportDate.ciphertext
+      encryptedCreditScore,
+      encryptedIncome,
+      encryptedReportDate
     );
   });
 
@@ -184,14 +168,13 @@ describe("ZKP SBT SelfSovereign", () => {
     it("should mint from final user address", async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
           rootHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate,
+          [encryptedCreditScore, encryptedIncome, encryptedReportDate],
+
           signature
         );
       const mintReceipt = await mintTx.wait();
@@ -207,14 +190,12 @@ describe("ZKP SBT SelfSovereign", () => {
       // we mint
       let mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
           rootHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate,
+          [encryptedCreditScore, encryptedIncome, encryptedReportDate],
           signature
         );
       let mintReceipt = await mintTx.wait();
@@ -236,14 +217,12 @@ describe("ZKP SBT SelfSovereign", () => {
     it("should get a valid token URI from its tokenId", async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
           rootHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate,
+          [encryptedCreditScore, encryptedIncome, encryptedReportDate],
           signature
         );
 
@@ -263,33 +242,32 @@ describe("ZKP SBT SelfSovereign", () => {
     it("decrypt the data with address1 private key and generate/validate proof", async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
           rootHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate,
+          [encryptedCreditScore, encryptedIncome, encryptedReportDate],
           signature
         );
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const sbtData = await zkSBTSelfSovereign.sbtData(tokenId);
+      const storedRoot = await zkSBTSelfSovereign.getRoot(tokenId);
+      const encryptedData = await zkSBTSelfSovereign.getEncryptedData(tokenId);
 
       // we decrypt the data with the private key of address1
       const decryptedCreditScore = await decryptWithPrivateKey(
         address1.privateKey,
-        sbtData.encryptedCreditScore
+        encryptedData[0]
       );
       const decryptedIncome = await decryptWithPrivateKey(
         address1.privateKey,
-        sbtData.encryptedIncome
+        encryptedData[1]
       );
       const decryptedReportDate = await decryptWithPrivateKey(
         address1.privateKey,
-        sbtData.encryptedReportDate
+        encryptedData[2]
       );
 
       // we check that the hash of the data is the same
@@ -306,14 +284,14 @@ describe("ZKP SBT SelfSovereign", () => {
               ])
             )
           ).toString(16)
-      ).to.equal(sbtData.root);
+      ).to.equal(storedRoot);
 
       // we check that the data is the same
       expect(+decryptedCreditScore).to.equal(creditScore);
 
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 3, // 3 = greater than or equal to
@@ -330,41 +308,34 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(40);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with invalid creditScore will fail (incorrect hash)", async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
           rootHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate,
+          [encryptedCreditScore, encryptedIncome, encryptedReportDate],
           signature
         );
 
       const mintReceipt = await mintTx.wait();
       const tokenId = mintReceipt.events![0].args![1].toNumber();
-      const sbtData = await zkSBTSelfSovereign.sbtData(tokenId);
+      const storedRoot = await zkSBTSelfSovereign.getRoot(tokenId);
 
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 3, // 3 = greater than or equal to
@@ -374,40 +345,34 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof will fail because the hash is not correct
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
   });
 
   describe("test ZKP comparator", () => {
     let tokenId;
-    let sbtData;
+    let storedRoot;
 
     beforeEach(async () => {
       const mintTx = await zkSBTSelfSovereign
         .connect(address1)
-        .mint(
+        ["mint(address,address,uint256,bytes,bytes[],bytes)"](
           address1.address,
           authority.address,
           signatureDate,
           rootHex,
-          encryptedCreditScore,
-          encryptedIncome,
-          encryptedReportDate,
+          [encryptedCreditScore, encryptedIncome, encryptedReportDate],
           signature
         );
 
       const mintReceipt = await mintTx.wait();
       tokenId = mintReceipt.events![0].args![1].toNumber();
-      sbtData = await zkSBTSelfSovereign.sbtData(tokenId);
+      storedRoot = await zkSBTSelfSovereign.getRoot(tokenId);
     });
 
     it("proof with valid creditScore will succeed (45==45)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 45,
         operator: 0, // 0 = equal to
@@ -419,24 +384,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(45);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with valid creditScore will fail (45==40)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 0, // 0 = equal to
@@ -446,16 +406,12 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
 
     it("proof with valid creditScore will succeed (45!=40)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 1, // 1 = different than
@@ -467,24 +423,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(40);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with valid creditScore will fail (45!=45)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 45,
         operator: 1, // 1 = different than
@@ -494,16 +445,12 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
 
     it("proof with valid creditScore will succeed (45>40)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 2, // 2 = greater than
@@ -515,24 +462,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(40);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with valid creditScore will fail (45>45)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 45,
         operator: 2, // 2 = greater than
@@ -542,16 +484,12 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
 
     it("proof with invalid creditScore will fail (45>50)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 50,
         operator: 2, // 2 = greater than
@@ -561,16 +499,12 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof will fail because the hash is not correct
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
 
     it("proof with valid creditScore will succeed (45>=40)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 3, // 3 = greater than or equal to
@@ -582,24 +516,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(40);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with valid creditScore will succeed (45>=45)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 45,
         operator: 3, // 3 = greater than or equal to
@@ -611,24 +540,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(45);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with invalid creditScore will fail (45>=50)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 50,
         operator: 3, // 3 = greater than or equal to
@@ -638,16 +562,12 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof will fail because the hash is not correct
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
 
     it("proof with valid creditScore will succeed (45<50)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 50,
         operator: 4, // 4 = less than
@@ -659,24 +579,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(50);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with valid creditScore will fail (45<45)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 45,
         operator: 4, // 4 = less than
@@ -686,16 +601,12 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
 
     it("proof with invalid creditScore will fail (45<40)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 4, // 4 = less than
@@ -705,16 +616,12 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof will fail because the hash is not correct
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
 
     it("proof with valid creditScore will succeed (45<=50)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 50,
         operator: 5, // 5 = less than or equal to
@@ -726,24 +633,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(50);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with valid creditScore will succeed (45<=45)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 45,
         operator: 5, // 5 = less than or equal to
@@ -755,24 +657,19 @@ describe("ZKP SBT SelfSovereign", () => {
       const proof = await genProof(input);
 
       // check ZKP proof
-      await verifyCreditScore.loanEligible(
-        proof.a,
-        proof.b,
-        proof.c,
-        proof.PubSignals,
-        zkSBTSelfSovereign.address,
-        tokenId
-      );
-
       expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(45);
+        await zkSBTSelfSovereign.verifyProof(
+          tokenId,
+          proof.Proof,
+          proof.PubSignals
+        )
+      ).to.be.true;
     });
 
     it("proof with invalid creditScore will fail (45<=40)", async () => {
       // input of ZKP
       const input = {
-        root: sbtData.root,
+        root: storedRoot,
         owner: address1.address,
         threshold: 40,
         operator: 5, // 5 = less than or equal to
@@ -782,10 +679,6 @@ describe("ZKP SBT SelfSovereign", () => {
 
       // generate ZKP proof will fail because the hash is not correct
       await expect(genProof(input)).to.be.rejected;
-
-      expect(
-        await verifyCreditScore.isElegibleForLoan(address1.address)
-      ).to.be.equal(0);
     });
   });
 });

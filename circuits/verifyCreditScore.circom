@@ -5,4 +5,4 @@ include "lib/verifyZKSBT.circom";
 // length = length of the data array
 // index = index of the data array
 
-component main {public [root,owner,threshold,operator]} = verifyZKSBT(4, 1);
+component main {public [index,root,owner,threshold,operator]} = verifyZKSBT(4);

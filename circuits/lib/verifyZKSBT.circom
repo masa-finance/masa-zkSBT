@@ -6,11 +6,11 @@ include "./compare.circom";
 // length = length of the data array
 template verifyZKSBT(length) {
     // public
-    signal input index;     // index of the data array
+    signal input index;     // index of the value in the data array
     signal input root;      // root of the merkle tree
     signal input owner;     // address of the owner of the soulbound token
-    signal input threshold; // threshold to compare the value with the data at the index
-    signal input operator;  // operator to compare the value with the data at the index
+    signal input threshold; // threshold to compare with the value
+    signal input operator;  // operator to compare the value with the threshold
     // 000: ==
     // 001: !=
     // 010: >

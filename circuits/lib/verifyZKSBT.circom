@@ -4,13 +4,13 @@ include "../../node_modules/circomlib/circuits/poseidon.circom";
 include "./compare.circom";
 
 // length = length of the data array
-// index = index of the data array
-template verifyZKSBT(length, index) {
+template verifyZKSBT(length) {
     // public
-    signal input root; // root of the merkle tree
-    signal input owner; // address of the owner of the soulbound token
-    signal input threshold;
-    signal input operator;
+    signal input index;     // index of the value in the data array
+    signal input root;      // root of the merkle tree
+    signal input owner;     // address of the owner of the soulbound token
+    signal input threshold; // threshold to compare with the value
+    signal input operator;  // operator to compare the value with the threshold
     // 000: ==
     // 001: !=
     // 010: >
@@ -26,9 +26,9 @@ template verifyZKSBT(length, index) {
     signal output out;
 
     // check that the owner is equal to the owner in the data
-    owner === data[0];
+    assert(owner == data[0]);
     // check that the value is equal to the data at the index
-    value === data[index];
+    assert(value == data[index]);
 
     // check merckle tree root of data to be equal to root public input
     component merkleTree = Poseidon(length);
@@ -46,7 +46,7 @@ template verifyZKSBT(length, index) {
     cmp.b <== threshold;
     cmp.op <== operator;
     cmp.out === 1;
-    
+
     // output
     out <== cmp.out;
 }

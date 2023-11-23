@@ -10,7 +10,7 @@ interface IVerifier {
         uint[2] memory a,
         uint[2][2] memory b,
         uint[2] memory c,
-        uint[5] memory input
+        uint[6] memory input
     ) external view returns (bool);
 }
 
@@ -75,7 +75,7 @@ abstract contract ZKSBT is IZKSBT, MasaSBT {
         uint[] memory proof,
         uint[] memory publicValues
     ) external view override returns (bool) {
-        address owner = address(uint160(publicValues[2]));
+        address owner = address(uint160(publicValues[3]));
 
         require(
             publicValues[0] ==
@@ -91,7 +91,7 @@ abstract contract ZKSBT is IZKSBT, MasaSBT {
         bytes memory root = getRoot(tokenId);
         require(
             keccak256(abi.encodePacked(root)) ==
-                keccak256(abi.encodePacked(publicValues[1])),
+                keccak256(abi.encodePacked(publicValues[2])),
             "The root of the Merkle Tree's data doesn't match the root stored in the SBT"
         );
 
@@ -99,12 +99,13 @@ abstract contract ZKSBT is IZKSBT, MasaSBT {
         uint[2] memory a = [proof[0], proof[1]];
         uint[2][2] memory b = [[proof[2], proof[3]], [proof[4], proof[5]]];
         uint[2] memory c = [proof[6], proof[7]];
-        uint[5] memory p = [
+        uint[6] memory p = [
             publicValues[0],
             publicValues[1],
             publicValues[2],
             publicValues[3],
-            publicValues[4]
+            publicValues[4],
+            publicValues[5]
         ];
 
         // Verify the proof

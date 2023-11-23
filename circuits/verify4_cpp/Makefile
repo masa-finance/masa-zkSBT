@@ -10,7 +10,7 @@ ifeq ($(shell uname),Linux)
 	NASM=nasm -felf64
 endif
 	
-all: verifyCreditScore
+all: verify4
 	
 %.o: %.cpp $(DEPS_HPP)
 	$(CC) -c $< $(CFLAGS)
@@ -18,5 +18,5 @@ all: verifyCreditScore
 fr_asm.o: fr.asm
 	$(NASM) fr.asm -o fr_asm.o
 	
-verifyCreditScore: $(DEPS_O) verifyCreditScore.o
-	$(CC) -o verifyCreditScore *.o -lgmp 
+verify4: $(DEPS_O) verify4.o
+	$(CC) -o verify4 *.o -lgmp 

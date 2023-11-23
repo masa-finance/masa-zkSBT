@@ -75,7 +75,7 @@ abstract contract ZKSBT is IZKSBT, MasaSBT {
         uint[] memory proof,
         uint[] memory publicValues
     ) external view override returns (bool) {
-        address owner = address(uint160(publicValues[2]));
+        address owner = address(uint160(publicValues[3]));
 
         require(
             publicValues[0] ==
@@ -91,7 +91,7 @@ abstract contract ZKSBT is IZKSBT, MasaSBT {
         bytes memory root = getRoot(tokenId);
         require(
             keccak256(abi.encodePacked(root)) ==
-                keccak256(abi.encodePacked(publicValues[1])),
+                keccak256(abi.encodePacked(publicValues[2])),
             "The root of the Merkle Tree's data doesn't match the root stored in the SBT"
         );
 

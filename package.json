@@ -61,7 +61,7 @@
     "hardhat-gas-reporter": "^1.0.8",
     "hardhat-waffle": "^0.0.1-security",
     "poseidon-lite": "^0.2.0",
-    "prettier": "^2.8.8",
+    "prettier": "^3.1.0",
     "prettier-plugin-solidity": "^1.2.0",
     "snarkjs": "^0.7.2",
     "solhint": "^4.0.0",

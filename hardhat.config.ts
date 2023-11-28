@@ -83,6 +83,7 @@ export default {
   },
   dodoc: {},
   typechain: {
-    outDir: "typechain"
+    outDir: "typechain",
+    target: "ethers-v5"
   }
 };

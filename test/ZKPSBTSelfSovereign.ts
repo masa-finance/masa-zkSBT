@@ -102,9 +102,8 @@ describe("ZKP SBT SelfSovereign", () => {
       value: ethers.utils.parseEther("1")
     });
 
-    const { address: zkSBTAddress } = await deployments.get(
-      "ZKSBTSelfSovereign"
-    );
+    const { address: zkSBTAddress } =
+      await deployments.get("ZKSBTSelfSovereign");
 
     zkSBTSelfSovereign = ZKSBTSelfSovereign__factory.connect(
       zkSBTAddress,

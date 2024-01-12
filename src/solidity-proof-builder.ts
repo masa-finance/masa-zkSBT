@@ -3,7 +3,7 @@
 const snarkjs = require("snarkjs");
 
 const wasm_path = "circuits/verify4_js/verify4.wasm";
-const zkey_path = "circuits/verify4_0001.zkey";
+const zkey_path = "circuits/verify4.zkey";
 
 const genProof = async (input) => {
   const { proof, publicSignals } = await snarkjs.groth16.fullProve(

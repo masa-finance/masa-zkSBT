@@ -64,7 +64,7 @@
     "prettier": "^3.1.0",
     "prettier-plugin-solidity": "^1.2.0",
     "snarkjs": "^0.7.2",
-    "solhint": "^4.0.0",
+    "solhint": "^5.0.1",
     "solhint-plugin-prettier": "^0.1.0",
     "solidity-coverage": "^0.8.5",
     "ts-generator": "^0.1.1",

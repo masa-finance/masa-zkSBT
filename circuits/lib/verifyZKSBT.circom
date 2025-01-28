@@ -26,9 +26,9 @@ template verifyZKSBT(length) {
     signal output out;
 
     // check that the owner is equal to the owner in the data
-    assert(owner == data[0]);
+    owner === data[0];
     // check that the value is equal to the data at the index
-    assert(value == data[index]);
+    value === data[index];
 
     // check merckle tree root of data to be equal to root public input
     component merkleTree = Poseidon(length);

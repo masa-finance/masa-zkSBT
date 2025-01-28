@@ -26,7 +26,7 @@ template Compare() {
 	validOp.in[0] <== op;
 	validOp.in[1] <== 6;
 	// Restrict to supported operators
-	assert(validOp.out);
+	validOp.out === 1;
 
 	component eq = IsEqual();
 	eq.in[0] <== a;
